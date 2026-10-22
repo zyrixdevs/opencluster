@@ -10,6 +10,7 @@ OpenCluster is planned as a self-hosted control plane for cluster nodes, infrast
 2. Check `git status`, the current branch, and recent history. Preserve existing work and commits. Never force-push or overwrite unrelated changes.
 3. Identify every caller, test, fixture, export, and document affected by the change. Make the smallest complete change and report any known limitation.
 4. Do not remove existing behavior without an explicit migration plan. Never commit credentials, tokens, private keys, or production data.
+5. Never delete existing code. When disabling code is required, preserve it as a language comment beginning `ORIGINAL (preserved, not deleted — disabled by comment):`.
 
 ## Repository organization
 
@@ -40,6 +41,12 @@ OpenCluster is planned as a self-hosted control plane for cluster nodes, infrast
 ## Agent delegation
 
 Use `.codex/agents/` roles for focused work. Delegate only independent tasks with non-overlapping file ownership; communicate scope and shared-work constraints. The reviewer reports findings and does not approve automatically. Automated review cannot be represented as independent human review.
+
+When a task has independent workstreams and the client supports delegation, use separate roles with explicit file ownership and consolidate their results. Do not delegate overlapping edits.
+
+## Code review standards
+
+Reviewers should check correctness, regressions, architecture and interface consistency, security and authorization, performance implications, maintainability, accessibility where relevant, and test coverage. Findings must be evidence-based, actionable, and ordered by severity. Do not approve automatically or treat automated review as independent human approval.
 
 ## Tests and validation
 

@@ -17,6 +17,8 @@ OpenCluster aims to give self-hosters and small infrastructure teams one place t
 
 The first node-agent target is Linux on Arch Linux and Debian, with architecture intended to remain distribution- and hardware-neutral. The control plane is planned for Linux-hosted containers. Other Linux distributions, Windows, macOS, Kubernetes, and managed cloud environments are future evaluation targets, not current support claims. Hardware metrics depend on operating-system interfaces and optional vendor drivers; GPU support must be capability-detected.
 
+The proposed MVP cluster type is an operator-owned homelab or small self-managed on-prem environment: one OpenCluster control-plane deployment managing one cluster of Linux nodes. Nodes may use different hardware; capabilities must be reported rather than assumed. Exact node-count limits and control-plane high availability are not set. Multi-cluster federation, managed cloud fleets, HPC scheduling, and Kubernetes clusters as a managed target are outside the initial supported scope.
+
 ## Product principles
 
 1. Self-hosted and operator-controlled; telemetry stays within the operator's deployment unless they configure an integration.
@@ -77,7 +79,7 @@ Targets below are requirements to validate during implementation, not measured p
 
 ## MVP boundary
 
-The proposed MVP is a secure, self-hosted, read-mostly control plane: user authentication, node enrollment/revocation, node inventory and labels, basic host telemetry, current node status, simple history/health views, and audit events for administration. Exact identity provider, retention defaults, and authorization policy remain decision points. Work queues, remote commands, broad agent execution, Kubernetes deployment, and GitHub automation are outside initial scope.
+The proposed MVP is a secure, self-hosted, read-mostly control plane: user authentication, node enrollment/revocation, node inventory and labels, basic host telemetry, current node status, simple history/health views, and audit events for administration. Baseline secret protection—including no embedded credentials, protected storage/configuration, and log redaction—is required; a general-purpose secrets manager or broad secret distribution service is outside MVP scope. Exact identity provider, retention defaults, and authorization policy remain decision points. Work queues, remote commands, broad agent execution, Kubernetes deployment, and GitHub automation are outside initial scope.
 
 ## Later and experimental capabilities
 
@@ -92,7 +94,7 @@ The proposed MVP is a secure, self-hosted, read-mostly control plane: user authe
 - PostgreSQL is the proposed durable store. Redis is optional and must be justified by measured queue, fanout, or cache needs.
 - External agent APIs, GitHub access, TLS certificates, and GPU drivers may require separate setup and may change independently.
 - A compromised control plane could affect enrolled nodes; isolation, narrow credentials, revocation, and recovery are critical risks.
-- Remote execution, secrets handling, and autonomous remediation substantially expand the threat surface and are excluded from the MVP proposal.
+- Remote execution, advanced secrets-management and secret-distribution features, and autonomous remediation substantially expand the threat surface and are excluded from the MVP proposal. Baseline protection of credentials used by MVP services remains required.
 
 ## Success measures
 

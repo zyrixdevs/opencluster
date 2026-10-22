@@ -6,6 +6,8 @@
 
 OpenCluster is planned as a self-hosted control plane with a browser UI, API/service layer, durable store, and separately supervised Linux node agents. The UI is not trusted to enforce authorization: the backend must authorize every request. Agents should expose a narrow, versioned protocol and must not become general-purpose remote shells.
 
+The initial topology proposal is one control-plane deployment managing one operator-owned cluster of Linux nodes, aimed at homelabs and small self-managed on-prem environments. Multi-cluster federation, managed cloud fleets, and Kubernetes as a managed cluster type are out of MVP scope; exact node-count limits and control-plane high availability remain open.
+
 ## Logical components
 
 1. **Web client:** React/TypeScript single-page interface; calls the API and subscribes to authorized live updates.
