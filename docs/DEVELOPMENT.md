@@ -2,20 +2,31 @@
 
 ## Current status
 
-OpenCluster is in Phase 0. No application package, backend, database schema, node agent, or runnable product exists. Repository checks below validate only Markdown links and project configuration.
+OpenCluster is implementing Phase 1: a standalone dashboard that runs locally with mock data. No backend, authentication service, database, node agent, remote execution, or cloud service is part of this phase.
 
 ## Prerequisites
 
 - Git
-- Python 3.12 or later for the current documentation check (standard library only)
+- Node.js 20.19+ (or 22.12+) and npm for the dashboard (Vite requirement)
+- Python 3.12 or later for documentation checks (standard library only)
 - Codex CLI only if you intend to use the project-local custom agents
 
-Node.js, PostgreSQL, Redis, Docker, and Kubernetes are not required for Phase 0. They will be needed only when the corresponding application or infrastructure work is approved.
+PostgreSQL, Redis, Docker, Kubernetes, credentials, and cloud services are not required to run the dashboard.
 
 ## Local workflow
 
 ```sh
-git switch -c docs/your-change
+npm --prefix dashboard install
+npm --prefix dashboard run dev
+```
+
+The dev server prints its local URL. For checks, run:
+
+```sh
+npm --prefix dashboard run typecheck
+npm --prefix dashboard run lint
+npm --prefix dashboard test
+npm --prefix dashboard run build
 python -m unittest discover -s tests -v
 python scripts/check_docs.py
 ```
@@ -24,9 +35,13 @@ Before a pull request, inspect `git status`, review the diff, and verify that cl
 
 ## Style and dependencies
 
-TypeScript will use strict mode and TSX for React components. Python will use type annotations at public interfaces. Formatting and linting tools will be selected with the first application milestone; no application dependency manifests exist yet. Avoid adding dependencies to solve checks already covered by the standard library.
+TypeScript uses strict mode and TSX for React components. Biome handles dashboard formatting and linting; Vite builds the app, and Vitest runs focused dashboard tests. Python will use type annotations at public interfaces. Avoid adding dependencies to solve checks already covered by the standard library.
 
 Use Conventional Commits (for example `docs: clarify node enrollment proposal`). Releases will follow semantic versioning once a first release is planned; no release version has been declared.
+
+## Dashboard architecture and motion
+
+Each page is loaded on demand. Mock domain data remains local to the typed data layer; browser storage holds only display preferences. Agents and Automation are interactive SVG/HTML mock canvases and never invoke external services. Mission Control's optional 3D globe is lazy-loaded and has a selectable-node fallback when WebGL is unavailable. See [Dashboard Motion and Performance](DASHBOARD_PERFORMANCE.md) for the animation responsibilities, tab-visibility pause, reduced-motion handling, and current limits.
 
 ## Codex agents
 

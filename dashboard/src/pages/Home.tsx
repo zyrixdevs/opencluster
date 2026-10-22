@@ -1,0 +1,386 @@
+import * as Icons from "lucide-react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { ResourceChart } from "../components/Charts";
+import { HologramVisual } from "../components/HologramVisual";
+import * as UI from "../components/ui";
+import { initialActivity, softwareCatalog } from "../data/mock";
+import { useDemoData } from "../data/useDashboardData";
+import { ActivityLine } from "./shared";
+
+export function HomePage() {
+  const { cluster, clusters, nodes } = useDemoData();
+  const online = nodes.filter(
+    (n) => n.health === "healthy" || n.health === "warning",
+  ).length;
+  const warning = nodes.filter(
+    (n) => n.health === "warning" || n.health === "offline",
+  ).length;
+  const avgCpu = nodes.length
+    ? Math.round(nodes.reduce((sum, n) => sum + n.cpu, 0) / nodes.length)
+    : 0;
+  const [toast, setToast] = useState("");
+  const notify = (message: string) => {
+    setToast(message);
+    window.setTimeout(() => setToast(""), 2600);
+  };
+  const greeting = new Intl.DateTimeFormat(undefined, {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  }).format(new Date());
+  return (
+    <>
+      {/* ORIGINAL (preserved, not deleted — disabled by comment): <UI.PageTitle eyebrow="WEDNESDAY, OCTOBER 22, 2026" title="Good evening, operator" description="Here's what's happening across your infrastructure." actions={<UI.Button variant="primary" onClick={() => notify("Demo action: cluster overview refreshed")}><Icons.Activity size={15} /> Refresh overview</UI.Button>} /> */}
+      <section className="home-hero">
+        <div className="home-hero-copy">
+          <div className="eyebrow">
+            <span className="hero-eyebrow-mark" /> OPENCLUSTER / MISSION SYSTEM
+          </div>
+          <h1>
+            Good evening,
+            <br />
+            <em>operator.</em>
+          </h1>
+          <p>
+            Your cluster operations, agent workflows, and system signals in one
+            place.
+          </p>
+          <div className="hero-actions">
+            <Link to="/mission-control" className="button button-primary">
+              <Icons.ScanEye size={15} /> Enter Mission Control
+            </Link>
+            <button
+              className="button button-secondary"
+              type="button"
+              onClick={() => notify("Demo action: cluster overview refreshed")}
+            >
+              <Icons.RefreshCw size={14} /> Refresh snapshot
+            </button>
+          </div>
+          <div className="hero-footnote">
+            <span className="status-pulse" /> SAMPLE ENVIRONMENT <i />{" "}
+            {greeting.toUpperCase()}
+          </div>
+        </div>
+        <HologramVisual />
+        <div className="hero-watermark" aria-hidden="true">
+          OC / 01
+        </div>
+      </section>
+      {toast && (
+        <div className="toast-demo" role="status">
+          {toast}
+        </div>
+      )}
+      <div className="demo-banner">
+        <span className="demo-banner-icon">
+          <Icons.Sparkles size={16} />
+        </span>
+        <div>
+          <b>You’re exploring OpenCluster in demo mode</b>
+          <span>
+            Everything you see is simulated. No infrastructure is connected.
+          </span>
+        </div>
+        <button
+          type="button"
+          aria-label="Dismiss demo message"
+          onClick={(e) => e.currentTarget.parentElement?.remove()}
+        >
+          <Icons.X size={14} />
+        </button>
+      </div>
+      <div className="stats-grid">
+        <UI.Stat
+          label="Total nodes"
+          value={String(nodes.length).padStart(2, "0")}
+          detail={`${online} online · ${warning} need attention`}
+          icon={<Icons.Server size={17} />}
+          tone="green"
+        />
+        <UI.Stat
+          label="Cluster health"
+          value={warning ? "Attention" : "Nominal"}
+          detail={`${cluster?.name ?? "No cluster"} · sample status`}
+          icon={<Icons.Activity size={17} />}
+          tone="blue"
+        />
+        <UI.Stat
+          label="Active tasks"
+          value="03"
+          detail="1 running · 1 queued · 1 done"
+          icon={<Icons.Workflow size={17} />}
+          tone="purple"
+        />
+        <UI.Stat
+          label="AI agents"
+          value="02"
+          detail="2 catalog entries available"
+          icon={<Icons.Bot size={17} />}
+          tone="amber"
+        />
+      </div>
+      <div className="home-pulse-grid">
+        <UI.Card className="home-pulse-card">
+          <div className="panel-heading">
+            <div>
+              <span className="eyebrow">CLUSTER FLEET</span>
+              <h2>Active clusters</h2>
+            </div>
+            <Link to="/clusters" className="text-link">
+              Manage <Icons.ArrowRight size={13} />
+            </Link>
+          </div>
+          <div className="home-cluster-list">
+            {clusters.slice(0, 3).map((item) => (
+              <Link className="home-cluster-row" to="/clusters" key={item.id}>
+                <span className="cluster-pip" />
+                <span>
+                  <b>{item.name}</b>
+                  <small>{item.region}</small>
+                </span>
+                <strong>
+                  {nodes
+                    .filter((node) => node.clusterId === item.id)
+                    .length.toString()
+                    .padStart(2, "0")}{" "}
+                  <small>NODES</small>
+                </strong>
+              </Link>
+            ))}
+          </div>
+        </UI.Card>
+        <UI.Card className="home-pulse-card home-agent-summary">
+          <div className="panel-heading">
+            <div>
+              <span className="eyebrow">AGENT ECOSYSTEM</span>
+              <h2>Orchestration layer</h2>
+            </div>
+            <Link to="/agents" className="text-link">
+              Open graph <Icons.ArrowRight size={13} />
+            </Link>
+          </div>
+          <div className="agent-summary-row">
+            <span className="agent-summary-icon">
+              <Icons.BrainCircuit size={15} />
+            </span>
+            <span>
+              <b>Codex Worker</b>
+              <small>Workflow ready · demo state</small>
+            </span>
+            <i className="agent-state-dot" />
+          </div>
+          <div className="agent-summary-row">
+            <span className="agent-summary-icon purple">
+              <Icons.Bot size={15} />
+            </span>
+            <span>
+              <b>Hermes Agent</b>
+              <small>Monitoring · demo state</small>
+            </span>
+            <i className="agent-state-dot" />
+          </div>
+          <div className="agent-summary-foot">
+            <Icons.CircleAlert size={13} /> All agent activity is illustrative.
+          </div>
+        </UI.Card>
+        <UI.Card className="home-pulse-card home-software-summary">
+          <div className="panel-heading">
+            <div>
+              <span className="eyebrow">SOFTWARE CATALOG</span>
+              <h2>Agent runtimes</h2>
+            </div>
+            <Link to="/software" className="text-link">
+              Browse <Icons.ArrowRight size={13} />
+            </Link>
+          </div>
+          <div className="software-summary-list">
+            {softwareCatalog.slice(0, 3).map((software) => (
+              <div key={software.id}>
+                <span>{software.name.slice(0, 1)}</span>
+                <b>{software.name}</b>
+                <small>
+                  {software.status === "available" ? "PREVIEW" : "PLANNED"}
+                </small>
+              </div>
+            ))}
+          </div>
+        </UI.Card>
+      </div>
+      <div className="home-alert-strip" role="status">
+        <Icons.CircleAlert size={14} />
+        <span>
+          <b>
+            {warning
+              ? `${warning} sample node${warning === 1 ? "" : "s"} need attention`
+              : "No sample alerts"}
+          </b>
+          <small>
+            Illustrative health status only · no nodes are connected
+          </small>
+        </span>
+        <Link to="/monitoring">
+          Review health <Icons.ArrowRight size={13} />
+        </Link>
+      </div>
+      <div className="dashboard-grid">
+        <UI.Card className="overview-chart-card">
+          <div className="panel-heading">
+            <div>
+              <span className="eyebrow">RESOURCE OVERVIEW</span>
+              <h2>Cluster utilization</h2>
+            </div>
+            <div className="chart-legend">
+              <span>
+                <i className="legend-dot cpu-dot" /> CPU
+              </span>
+              <span>
+                <i className="legend-dot mem-dot" /> Memory
+              </span>
+              <button type="button" className="select-pill">
+                Last 24 hours <Icons.ChevronDown size={13} />
+              </button>
+            </div>
+          </div>
+          <div className="resource-summary">
+            <div>
+              <span>AVG CPU</span>
+              <b>{avgCpu}%</b>
+              <small className="positive">
+                <Icons.ArrowDownRight size={12} /> 4.2% vs yesterday
+              </small>
+            </div>
+            <div>
+              <span>AVG MEMORY</span>
+              <b>
+                {Math.round(
+                  nodes.reduce((sum, n) => sum + n.memory, 0) /
+                    Math.max(nodes.length, 1),
+                )}
+                %
+              </b>
+              <small>Across {nodes.length} sample nodes</small>
+            </div>
+            <div>
+              <span>NETWORK I/O</span>
+              <b>
+                2.4 <i>Gb/s</i>
+              </b>
+              <small>
+                <Icons.ArrowUpRight size={12} /> peak 3.1 Gb/s
+              </small>
+            </div>
+          </div>
+          <div className="home-chart">
+            <ResourceChart metric="cpu" compareMemory />
+          </div>
+        </UI.Card>
+        <UI.Card className="quick-actions">
+          <div className="panel-heading">
+            <div>
+              <span className="eyebrow">SHORTCUTS</span>
+              <h2>Quick actions</h2>
+            </div>
+            <Icons.Settings2 size={16} className="muted" />
+          </div>
+          <div className="action-list">
+            <Link to="/clusters" className="action-tile">
+              <span className="action-icon blue">
+                <Icons.Plus size={17} />
+              </span>
+              <span>
+                <b>Create a cluster</b>
+                <small>Set up a new demo cluster</small>
+              </span>
+              <Icons.ArrowRight size={15} />
+            </Link>
+            <Link to="/nodes" className="action-tile">
+              <span className="action-icon green">
+                <Icons.Server size={17} />
+              </span>
+              <span>
+                <b>Explore nodes</b>
+                <small>Inspect resource details</small>
+              </span>
+              <Icons.ArrowRight size={15} />
+            </Link>
+            <Link to="/software" className="action-tile">
+              <span className="action-icon purple">
+                <Icons.TerminalSquare size={17} />
+              </span>
+              <span>
+                <b>Browse AI software</b>
+                <small>Preview catalog integrations</small>
+              </span>
+              <Icons.ArrowRight size={15} />
+            </Link>
+            <Link to="/automation" className="action-tile">
+              <span className="action-icon amber">
+                <Icons.Workflow size={17} />
+              </span>
+              <span>
+                <b>Design an automation</b>
+                <small>Preview a demo workflow</small>
+              </span>
+              <Icons.ArrowRight size={15} />
+            </Link>
+          </div>
+          <div className="quick-note">
+            <Icons.CircleAlert size={14} /> Actions in this demo do not affect
+            real systems.
+          </div>
+        </UI.Card>
+        <UI.Card className="node-overview">
+          <div className="panel-heading">
+            <div>
+              <span className="eyebrow">INFRASTRUCTURE</span>
+              <h2>Node status</h2>
+            </div>
+            <Link to="/nodes" className="text-link">
+              View all nodes <Icons.ArrowRight size={13} />
+            </Link>
+          </div>
+          <div className="overview-node-list">
+            {nodes.slice(0, 4).map((node) => (
+              <div className="overview-node" key={node.id}>
+                <span className={`node-indicator ${node.health}`} />
+                <div className="overview-node-name">
+                  <b>{node.name}</b>
+                  <small>
+                    {node.role === "coordinator" ? "Coordinator" : "Worker"}
+                  </small>
+                </div>
+                <div className="overview-cpu">
+                  <small>CPU</small>
+                  <b>{node.cpu}%</b>
+                  <UI.Progress
+                    value={node.cpu}
+                    tone={node.cpu > 75 ? "amber" : "blue"}
+                  />
+                </div>
+                <UI.HealthBadge health={node.health} />
+              </div>
+            ))}
+          </div>
+        </UI.Card>
+        <UI.Card className="activity-overview">
+          <div className="panel-heading">
+            <div>
+              <span className="eyebrow">RECENT EVENTS</span>
+              <h2>Activity</h2>
+            </div>
+            <Link to="/activity" className="text-link">
+              View activity <Icons.ArrowRight size={13} />
+            </Link>
+          </div>
+          <div className="mini-timeline">
+            {initialActivity.slice(0, 4).map((event) => (
+              <ActivityLine key={event.id} event={event} compact />
+            ))}
+          </div>
+        </UI.Card>
+      </div>
+    </>
+  );
+}

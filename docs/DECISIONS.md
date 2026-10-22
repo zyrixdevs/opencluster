@@ -4,6 +4,21 @@ This is a lightweight decision log. Proposals below are not implementation commi
 
 ## Proposed starting decisions
 
+### D-005 — Dashboard-first Phase 1
+
+- **Status:** Accepted for Phase 1.
+- **Decision:** Build a standalone React/TypeScript dashboard in `dashboard/`, backed by a typed local mock-data interface. The dashboard demonstrates navigation and workflows only; its install, task, and cluster actions do not control real systems.
+- **Reason:** Establish the operator experience and data contracts without adding backend or infrastructure scope.
+- **Boundaries:** No backend, authentication service, node agent, remote execution, live installation, or cloud service. Persist only non-sensitive demo preferences in browser storage.
+- **Revisit when:** a maintainer approves the next backend/node-agent milestone and its security design.
+
+### D-006 — Page-split visualizations for Phase 1
+
+- **Status:** Accepted for Phase 1.
+- **Decision:** Use lazy-loaded pages, SVG/HTML for agent and workflow canvases, and Three.js only for the optional Mission Control globe. Keep Framer Motion, GSAP, and Lenis responsibilities separate and honor reduced-motion, performance mode, and hidden tabs.
+- **Reason:** Deliver the requested visual experiences while keeping the initial application route lighter and preserving static/accessibility fallbacks.
+- **Revisit when:** production profiles show a need for graph virtualization, a different rendering engine, or tighter resource limits.
+
 ### D-001 — Foundation-only scope
 
 - **Status:** Accepted for Phase 0.

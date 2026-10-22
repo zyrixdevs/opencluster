@@ -1,13 +1,14 @@
 # Proposed Technical Stack
 
-**Status:** Proposal; dependencies have not been selected or installed for an application.
+**Status:** Dashboard choices are selected for Phase 1; backend, database, node-agent, and deployment choices remain proposals.
 
 | Area | Starting choice | Rationale and trade-off |
 |---|---|---|
-| Web | React, TypeScript, Vite | Familiar component ecosystem and fast local development; adds a separate frontend build. |
-| UI | Tailwind CSS, shadcn/ui, Lucide React; React Bits selectively | Utility-first styling and composable components; third-party effects must not compromise clarity or accessibility. |
-| Client data | TanStack Query; Zustand only for local cross-view state | Query cache handles server state; Zustand should not duplicate server data. |
-| Charts | Recharts | React-oriented charts; evaluate density and accessibility with actual telemetry needs. |
+| Web | React, TypeScript, Vite in `dashboard/` | Standalone local app; no backend required for Phase 1. |
+| UI | Tailwind CSS, shadcn/ui component patterns, Lucide React; Sora + Inter self-hosted fonts | Utility-first styling and composable components; bundled fonts avoid runtime font CDN requests. |
+| Client data | TanStack Query for the mock data-access boundary; Zustand for local cross-view state | Preserve a replaceable data boundary without implying live server connectivity. |
+| Charts | Recharts | React-oriented charts; current charts display generated demo history. |
+| Motion and visualization | Framer Motion for route transitions, GSAP for the Home visual, Lenis for document scroll, Three.js for an optional lazy Mission Control globe; SVG for graph/workflow canvases | Each tool has a narrow role; respect reduced motion, pause scenes when hidden, and keep Three.js in a lazy route chunk. See [dashboard performance](DASHBOARD_PERFORMANCE.md). |
 | API | Python and FastAPI | Typed schemas and async support; concurrency and blocking work must be managed explicitly. |
 | Durable data | PostgreSQL | Transactions and relational integrity; time-series retention strategy remains open. |
 | Live updates | WebSockets | Interactive updates; requires authorization, reconnect, and backpressure design. |
@@ -18,7 +19,7 @@
 
 ## Engineering conventions proposed
 
-Enable TypeScript strict mode. Use Python type annotations and a project-selected formatter/linter once application code begins. Pin and review dependencies through lockfiles and automated dependency updates. Prefer generated or shared API schemas over duplicated assumptions. Choose semantic versioning after the project publishes releases; use Conventional Commits as a contribution convention. Exact tooling versions are intentionally not specified in this foundation document.
+The dashboard enables TypeScript strict mode and uses a committed npm lockfile, Biome, and Vitest. Use Python type annotations when backend code begins. Prefer generated or shared API schemas over duplicated assumptions. Choose semantic versioning after the project publishes releases; use Conventional Commits as a contribution convention.
 
 ## Alternatives to evaluate
 

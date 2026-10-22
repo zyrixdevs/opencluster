@@ -1,28 +1,35 @@
 # Roadmap
 
-**Status:** Planning roadmap; no milestones are complete and no dates are committed.
+**Status:** Phase 0 foundation is complete. Phase 1 dashboard development is the current milestone. No dates or release versions are committed.
 
-## Phase 0 — Foundation (current)
+## Phase 0 — Repository foundation (complete)
 
-- Establish product scope, architecture proposals, security boundaries, contribution workflow, and project-local agent guidance.
-- Validate documentation and repository conventions.
+- Establish the repository structure, community policies, project-local Codex guidance, and product/architecture proposals.
+- Add documentation validation and contribution workflows.
 
-## Phase 1 — MVP design and secure vertical slice
+## Phase 1 — Standalone dashboard (current)
 
-- Resolve authentication, authorization, enrollment, revocation, audit, retention, and deployment decisions.
-- Implement the smallest end-to-end path: authenticated control-plane access, node enrollment, node inventory, and read-only basic telemetry.
-- Add contract tests, migrations, packaging, threat review, and operational recovery documentation.
+Build a responsive React, TypeScript, and Vite dashboard in `dashboard/`, backed only by typed mock data and local demo preferences.
 
-## Phase 2 — Operator visibility
+- Deliver Home, Mission Control, Clusters, Nodes, Agents, Automation, AI Software, Tasks, Monitoring, Activity, and Settings views.
+- Support useful demo interactions for cluster metadata, node selection, topology navigation, agent graph and workflow canvases, catalog previews, task controls, filters, and preferences.
+- Keep heavy scenes route-split and lazy-loaded; respect reduced-motion, performance, and tab visibility preferences.
+- Clearly label simulated data, task execution, and software installation previews.
+- Validate with the checked-in type checker, linter, tests, and production build; document local setup using actual package scripts.
 
-- Add historical views, health checks, alert rules, and searchable operational events based on measured retention requirements.
-- Improve deployment, upgrade, backup, and restore workflows.
+**Phase 1 exclusions:** backend, authentication services, database, node agent, real telemetry, remote commands, real software installation, real workload execution, and required cloud services. A completed dashboard is a demo interface, not a functioning infrastructure control plane.
 
-## Phase 3 — Controlled operations and integrations
+## Phase 2 — Control-plane design and foundation (future)
 
-- Evaluate narrow service operations, GitHub status integration, and agent adapters with scoped credentials and reviewable audit trails.
-- Define job queue and retry semantics before distributing workloads.
+- Revisit API, database, identity, authorization, enrollment, revocation, audit, telemetry freshness, retention, deployment, and recovery decisions using the dashboard contracts as input.
+- Implement a self-hosted control plane only after the security and operational boundaries are reviewed.
+
+## Phase 3 — Linux node agent and read-only telemetry (future)
+
+- Evaluate and implement secure node enrollment and a lightweight Linux service for capability-based host metrics.
+- Add authenticated, bounded telemetry transport and operator-visible freshness/failure states.
+- Validate on explicitly supported environments before making support claims.
 
 ## Later evaluation
 
-Kubernetes deployment, multi-cluster federation, GPU scheduling, broad terminal access, automated remediation, and AI-driven workflows require separate evidence and security review. No feature above is promised until maintainers accept its design and implementation.
+Historical monitoring, alerts, log search, scoped GitHub and AI-agent integrations, controlled service operations, job scheduling, Docker Compose packaging, Kubernetes, multi-cluster federation, GPU scheduling, terminal access, automated remediation, and AI-driven workflows require separate design, implementation, and security review. None is promised by the current dashboard milestone.

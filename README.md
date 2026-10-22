@@ -3,57 +3,56 @@
 **One dashboard. Every node. Total control.**
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
-[![Status: Phase 0](https://img.shields.io/badge/status-Phase%200%20%7C%20planning-lightgrey)](docs/ROADMAP.md)
+[![Status: Phase 1](https://img.shields.io/badge/status-Phase%201%20%7C%20dashboard%20development-blue)](docs/ROADMAP.md)
 
-OpenCluster is a planned free, open-source, self-hosted platform for monitoring and managing computing clusters, infrastructure nodes, AI agents, and distributed workloads through a unified web dashboard. It is maintained by **ZYRIX DEVS**.
+OpenCluster is an open-source project by **ZYRIX DEVS**. Its long-term goal is a self-hosted platform for understanding and managing clusters, infrastructure nodes, AI agents, and distributed workloads.
 
-> **Project status:** repository foundation and design phase. The dashboard, backend, node agent, and deployment stack are not implemented. Feature descriptions below are plans, not available functionality.
+## Current project status
 
-## Planned capabilities
+Phase 0 repository foundation is complete. Phase 1 is focused on a standalone web dashboard in `dashboard/`, using local mock data to demonstrate cluster operations and monitoring views. The application is still under development; the required pages and interactions are not claimed as complete until implemented and verified.
 
-- Cluster and node health, resource telemetry, alerts, logs, and history.
-- Secure node enrollment, labels, groups, and permission-controlled operations.
-- Distributed task scheduling and recovery policies.
-- Extensible AI agent adapters, including Codex and Hermes where supported.
-- GitHub and developer-operations visibility with auditable administrative controls.
+The Phase 1 dashboard is a **demo interface only**. It does not connect to real clusters, run tasks, install software, or provide live telemetry. It has no backend, authentication service, database, or node agent, and does not require a cloud service.
 
-The initial release is expected to focus on secure node enrollment, read-only cluster and node visibility, and a small operator-managed deployment. Scope remains subject to maintainer review; see the [PRD](docs/PRD.md) and [roadmap](docs/ROADMAP.md).
+## Dashboard scope
 
-## Proposed architecture
+The dashboard includes Home, Mission Control, Clusters, Nodes, Agents, Automation, AI Software, Tasks, Monitoring, Activity, and Settings views. Its cluster topology, metrics, agent/workflow canvases, task activity, and software installation previews use simulated data and actions. See the [Phase 1 product requirements](docs/PRD.md) for acceptance criteria and explicit limits.
 
-The current proposal uses a React, TypeScript, and Vite frontend; a Python/FastAPI control plane; PostgreSQL for durable state; and a lightweight Linux node agent. Docker Compose is the planned local deployment path. These choices are not implemented or locked; trade-offs are recorded in [architecture](docs/ARCHITECTURE.md) and [technology stack](docs/TECH_STACK.md).
+## Future direction
 
-```text
-frontend/       dashboard (planned)
-backend/        API and control plane (planned)
-node-agent/     Linux metrics and secure communication (planned)
-infrastructure/ local and future deployment assets (planned)
-docs/           requirements and design decisions
+Backend services, secure node enrollment, real telemetry, authentication and authorization, audit logging, AI-agent integrations, and workload orchestration belong to later phases. They are not current capabilities. The [roadmap](docs/ROADMAP.md) and [architecture proposal](docs/ARCHITECTURE.md) distinguish future designs from implemented software.
+
+## Development
+
+The dashboard requires Node.js 20.19+ or 22.12+ and npm (Vite's supported Node versions). From the repository root, install dependencies and start the local development server:
+
+```sh
+npm --prefix dashboard install
+npm --prefix dashboard run dev
 ```
 
-## Development status
+Vite prints the local URL when the server starts. The dashboard uses mock data only; no backend or cloud service is needed. Run the available checks and production build with:
 
-Phase 0 work is limited to repository structure, documentation, Codex guidance, and docs validation. There are no application prerequisites or runnable app commands yet.
+```sh
+npm --prefix dashboard run typecheck
+npm --prefix dashboard run lint
+npm --prefix dashboard test
+npm --prefix dashboard run build
+```
 
-To work on the repository foundation:
-
-1. Clone this repository and create a topic branch.
-2. Read [AGENTS.md](AGENTS.md), [development guide](docs/DEVELOPMENT.md), and the relevant design documents.
-3. Edit documentation or repository configuration and run the checks documented in `docs/DEVELOPMENT.md`.
-4. Open a pull request against `main` using the [contribution guide](CONTRIBUTING.md).
+For repository contribution setup, read [AGENTS.md](AGENTS.md), the [development guide](docs/DEVELOPMENT.md), and [CONTRIBUTING.md](CONTRIBUTING.md). Review the [testing strategy](docs/TESTING_STRATEGY.md) for current repository checks. Open a pull request against `main` following the [GitHub workflow](docs/GITHUB_WORKFLOW.md).
 
 ## Documentation
 
-- [Product requirements](docs/PRD.md) · [Architecture](docs/ARCHITECTURE.md) · [Roadmap](docs/ROADMAP.md)
-- [Technology stack](docs/TECH_STACK.md) · [API design](docs/API_DESIGN.md) · [Database design](docs/DATABASE_DESIGN.md)
-- [Node protocol](docs/NODE_PROTOCOL.md) · [Security architecture](docs/SECURITY_ARCHITECTURE.md)
-- [Design system](docs/DESIGN_SYSTEM.md) · [Agent orchestration](docs/AGENT_ORCHESTRATION.md)
-- [Development](docs/DEVELOPMENT.md) · [Deployment](docs/DEPLOYMENT.md) · [Testing strategy](docs/TESTING_STRATEGY.md)
-- [GitHub workflow](docs/GITHUB_WORKFLOW.md) · [Decisions](docs/DECISIONS.md)
+- [Product requirements](docs/PRD.md) · [Roadmap](docs/ROADMAP.md) · [Architecture proposal](docs/ARCHITECTURE.md)
+- [Technology stack](docs/TECH_STACK.md) · [Design system](docs/DESIGN_SYSTEM.md)
+- [Dashboard motion and performance](docs/DASHBOARD_PERFORMANCE.md)
+- [API design proposal](docs/API_DESIGN.md) · [Database design proposal](docs/DATABASE_DESIGN.md) · [Node protocol proposal](docs/NODE_PROTOCOL.md)
+- [Security architecture proposal](docs/SECURITY_ARCHITECTURE.md) · [Development](docs/DEVELOPMENT.md) · [Testing strategy](docs/TESTING_STRATEGY.md)
+- [Deployment proposal](docs/DEPLOYMENT.md) · [GitHub workflow](docs/GITHUB_WORKFLOW.md) · [Decisions](docs/DECISIONS.md)
 
-## Contributing
+## Contributing and security
 
-Contributions are welcome after reading [CONTRIBUTING.md](CONTRIBUTING.md). Please open an issue for substantial proposals before implementation. Security issues should follow [SECURITY.md](SECURITY.md), not a public issue.
+Contributions are welcome under [CONTRIBUTING.md](CONTRIBUTING.md). Please report security concerns through [SECURITY.md](SECURITY.md), not a public issue. Security proposals in the design documents do not mean corresponding protections are implemented in this demo dashboard.
 
 ## License and attribution
 

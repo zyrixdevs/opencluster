@@ -23,6 +23,14 @@ class DocumentationLinksTest(unittest.TestCase):
             )
             self.assertEqual(broken_links(root), [])
 
+    def test_ignores_installed_dependency_documentation(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            dependency = root / "dashboard" / "node_modules" / "package"
+            dependency.mkdir(parents=True)
+            (dependency / "README.md").write_text("[upstream](missing.md)", encoding="utf-8")
+            self.assertEqual(broken_links(root), [])
+
 
 if __name__ == "__main__":
     unittest.main()
