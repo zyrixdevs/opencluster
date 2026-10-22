@@ -1,0 +1,36 @@
+# Editor and operating system
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+dist/
+build/
+*.egg-info/
+
+# JavaScript / TypeScript
+node_modules/
+coverage/
+.vite/
+.turbo/
+
+# Local runtime data
+*.log
+data/

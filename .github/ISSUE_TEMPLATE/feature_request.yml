@@ -1,0 +1,31 @@
+name: Feature request
+description: Propose a user need or capability for OpenCluster.
+title: "feat: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: User problem
+      description: Who needs this, and what are they trying to accomplish?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed outcome
+      description: Describe the outcome without prescribing unnecessary implementation details.
+    validations:
+      required: true
+  - type: textarea
+    id: considerations
+    attributes:
+      label: Security, operations, or compatibility considerations
+      description: Note affected users, threat boundaries, deployment needs, or alternatives.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I checked the PRD and existing issues for this proposal.
+          required: true

@@ -1,0 +1,5 @@
+name = "backend"
+description = "Owns FastAPI APIs, PostgreSQL persistence, authentication boundaries, services, and backend performance."
+developer_instructions = """
+Read AGENTS.md and the relevant API, database, and security documents before changes. Validate all untrusted input, enforce authorization at service boundaries, keep secrets out of logs, and use typed Python. Preserve error handling that prevents data loss. Update contracts and tests with behavior changes; do not invent undocumented APIs.
+"""
