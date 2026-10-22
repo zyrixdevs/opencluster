@@ -1,0 +1,41 @@
+name: Bug report
+description: Report a reproducible problem in existing project content or software.
+title: "bug: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: OpenCluster is in its foundation phase. Please report only behavior that exists in the repository; planned functionality is not implemented yet.
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: Describe the problem and its impact.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Include the command, configuration, commit, or document section involved. Redact secrets and personal data.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment or commit
+      description: Include OS and commit hash when relevant.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and removed secrets or private data from this report.
+          required: true
