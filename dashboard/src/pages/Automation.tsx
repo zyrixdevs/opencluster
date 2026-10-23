@@ -156,7 +156,11 @@ function Editor() {
     }),
     [name, nodes, edges],
   );
+  const latestModel = useRef(model);
+  const hydratedRef = useRef(hydrated);
   const issues = useMemo(() => workflowIssues(model), [model]);
+  latestModel.current = model;
+  hydratedRef.current = hydrated;
   useEffect(() => {
     let active = true;
     initial
@@ -179,11 +183,21 @@ function Editor() {
     };
   }, [initial, setNodes, setEdges]);
   useEffect(() => {
-    if (hydrated)
+    if (!hydrated) return;
+    const timer = window.setTimeout(() => {
       void saveWorkflow(model).catch(() =>
         setMessage("Could not save workflow to this browser."),
       );
+    }, 350);
+    return () => window.clearTimeout(timer);
   }, [hydrated, model]);
+  useEffect(
+    () => () => {
+      if (hydratedRef.current)
+        void saveWorkflow(latestModel.current).catch(() => undefined);
+    },
+    [],
+  );
   const snapshot = () =>
     setHistory((items) => recordWorkflowChange(items, model));
   const connect = useCallback(

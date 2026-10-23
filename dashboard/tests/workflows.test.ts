@@ -91,9 +91,11 @@ describe("demo workflows", () => {
     );
     const undone = undoWorkflow(recorded, changed);
     expect(undone?.workflow.name).toBe(starterWorkflow.name);
-    const redone = redoWorkflow(undone!.history, undone!.workflow);
+    if (!undone) throw new Error("Expected the changed workflow to undo.");
+    const redone = redoWorkflow(undone.history, undone.workflow);
     expect(redone?.workflow.name).toBe(changed.name);
-    expect(recordWorkflowChange(redone!.history, changed).future).toEqual([]);
+    if (!redone) throw new Error("Expected the undone workflow to redo.");
+    expect(recordWorkflowChange(redone.history, changed).future).toEqual([]);
   });
 
   it("rejects self, duplicate, and cyclic connections", () => {

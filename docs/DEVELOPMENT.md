@@ -46,3 +46,8 @@ Each page is loaded on demand. Pages read structured records through the data ac
 ## Codex agents
 
 Root instructions are in `AGENTS.md`; project-local agent roles are in `.codex/agents/`. The role files use Codex's supported standalone TOML format. No model, credential, or machine-specific path is pinned. See [agent orchestration](AGENT_ORCHESTRATION.md).
+## Dashboard navigation and motion
+
+The dashboard shell uses the grouped BranchedMenu for its workspace navigation and a compact Dock for quick links. The Home KPI cards use an accessible Counter animation; reduced-motion preferences show the final value immediately. These are local UI controls and do not imply live cluster connectivity.
+
+The automation editor debounces local persistence while nodes are being dragged. Pointer movement updates the canvas immediately; only the settled workflow snapshot is written to IndexedDB. Route-level visualization and chart chunks remain lazy loaded to keep the initial shell smaller.

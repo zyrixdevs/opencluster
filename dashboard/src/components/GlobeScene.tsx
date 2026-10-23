@@ -146,6 +146,7 @@ export function GlobeScene({ nodes }: { nodes: Node[] }) {
     renderer.domElement.setAttribute("aria-hidden", "true");
     let frame = 0;
     let resizeFrame = 0;
+    let pointerFrame = 0;
     let dragging = false;
     let moved = false;
     let lastX = 0;
@@ -166,6 +167,13 @@ export function GlobeScene({ nodes }: { nodes: Node[] }) {
       if (animate) globe.rotation.y += 0.0012;
       renderer.render(scene, camera);
       if (animate) frame = requestAnimationFrame(render);
+    };
+    const renderAfterPointer = () => {
+      if (animate || pointerFrame) return;
+      pointerFrame = requestAnimationFrame(() => {
+        pointerFrame = 0;
+        renderer.render(scene, camera);
+      });
     };
     const visibility = () => {
       cancelAnimationFrame(frame);
@@ -190,7 +198,7 @@ export function GlobeScene({ nodes }: { nodes: Node[] }) {
       );
       lastX = event.clientX;
       lastY = event.clientY;
-      renderer.render(scene, camera);
+      renderAfterPointer();
     };
     const pointerUp = (event: PointerEvent) => {
       dragging = false;
@@ -213,7 +221,7 @@ export function GlobeScene({ nodes }: { nodes: Node[] }) {
       );
       zoomRef.current = camera.position.z;
       setZoom(camera.position.z);
-      renderer.render(scene, camera);
+      renderAfterPointer();
     };
     const observer = new ResizeObserver(resize);
     observer.observe(host);
@@ -228,6 +236,7 @@ export function GlobeScene({ nodes }: { nodes: Node[] }) {
     return () => {
       cancelAnimationFrame(frame);
       cancelAnimationFrame(resizeFrame);
+      cancelAnimationFrame(pointerFrame);
       observer.disconnect();
       document.removeEventListener("visibilitychange", visibility);
       renderer.domElement.removeEventListener("pointerdown", pointerDown);

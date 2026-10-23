@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from "react";
 import type { Health } from "../data/models";
+import { Counter } from "./Counter";
 
 export function Button({
   className = "",
@@ -55,7 +56,7 @@ export function Stat({
   tone = "neutral",
 }: {
   label: string;
-  value: string;
+  value: ReactNode;
   detail: string;
   icon: ReactNode;
   tone?: string;
@@ -64,7 +65,13 @@ export function Stat({
     <Card className="stat-card">
       <div className={`stat-icon ${tone}`}>{icon}</div>
       <div className="stat-label">{label}</div>
-      <div className="stat-value">{value}</div>
+      <div className="stat-value">
+        {typeof value === "number" ? (
+          <Counter value={value} fontSize="inherit" fontWeight={600} />
+        ) : (
+          value
+        )}
+      </div>
       <div className="stat-detail">{detail}</div>
     </Card>
   );

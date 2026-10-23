@@ -23,6 +23,8 @@ import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useDashboardStore } from "../state/useDashboardStore";
+import { BranchedMenu } from "./BranchedMenu";
+import { Dock } from "./Dock";
 import { Button } from "./ui";
 
 const navItems = [
@@ -50,6 +52,40 @@ const routeNames: Record<string, string> = {
   "/activity": "Activity",
   "/settings": "Settings",
 };
+const branchedItems = [
+  { label: "Overview", value: "/", icon: <Grid2X2 size={16} /> },
+  {
+    label: "Operations",
+    children: [
+      {
+        value: "/mission-control",
+        label: "Mission Control",
+        icon: <Sparkles size={16} />,
+      },
+      { value: "/clusters", label: "Clusters", icon: <Layers3 size={16} /> },
+      { value: "/nodes", label: "Nodes", icon: <Cpu size={16} /> },
+      { value: "/monitoring", label: "Monitoring", icon: <Gauge size={16} /> },
+      { value: "/activity", label: "Activity", icon: <Bell size={16} /> },
+    ],
+  },
+  {
+    label: "Orchestration",
+    children: [
+      { value: "/agents", label: "Agents", icon: <BrainCircuit size={16} /> },
+      {
+        value: "/automation",
+        label: "Automation",
+        icon: <Workflow size={16} />,
+      },
+      {
+        value: "/software",
+        label: "AI Software",
+        icon: <TerminalSquare size={16} />,
+      },
+      { value: "/tasks", label: "Tasks", icon: <Activity size={16} /> },
+    ],
+  },
+];
 function keepFocusInDialog(event: ReactKeyboardEvent<HTMLElement>) {
   if (event.key !== "Tab") return;
   const focusable = Array.from(
@@ -191,7 +227,12 @@ export function AppShell() {
           </div>
         </div>
         <div className="nav-heading">WORKSPACE</div>
-        <nav className="main-nav">
+        <BranchedMenu
+          items={branchedItems}
+          active={location.pathname}
+          onSelect={(value) => navigate(value)}
+        />
+        {/* ORIGINAL (preserved, not deleted — disabled by comment): <nav className="main-nav">
           {navItems.map(({ label, to, icon: Icon }) => (
             <NavLink
               key={to}
@@ -206,7 +247,7 @@ export function AppShell() {
               {label === "Activity" && <span className="nav-count">2</span>}
             </NavLink>
           ))}
-        </nav>
+        </nav> */}
         <div className="sidebar-spacer" />
         <div className="sidebar-health">
           <div className="health-orb">
@@ -317,6 +358,7 @@ export function AppShell() {
           </span>
         </footer>
       </main>
+      <Dock />
       {searchOpen && (
         <div className="command-backdrop">
           {/* ORIGINAL (preserved, not deleted — disabled by comment): onMouseDown={(e) => { if (e.target === e.currentTarget) setSearchOpen(false); }} */}

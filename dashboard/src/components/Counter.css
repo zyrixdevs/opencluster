@@ -1,0 +1,9 @@
+.counter {
+  display: inline-flex;
+  align-items: baseline;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.counter > span {
+  display: inline-block;
+}

@@ -3575,6 +3575,21 @@ a {
   }
 }
 
+@media (max-width: 820px) {
+  .sidebar {
+    overflow-y: auto;
+  }
+  .branched-menu {
+    display: none;
+  }
+  .sidebar .settings-link {
+    display: none;
+  }
+  .page-scroll {
+    padding-bottom: 96px;
+  }
+}
+
 .topology-stage {
   position: absolute;
   inset: 0;

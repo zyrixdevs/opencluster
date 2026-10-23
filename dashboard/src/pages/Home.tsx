@@ -3,6 +3,7 @@ import * as Icons from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ResourceChart } from "../components/Charts";
+import { Counter } from "../components/Counter";
 import { HologramVisual } from "../components/HologramVisual";
 import * as UI from "../components/ui";
 import type { ActivityEvent, Software } from "../data/models";
@@ -116,37 +117,72 @@ export function HomePage() {
       <div className="stats-grid">
         <UI.Stat
           label="Clusters"
-          value={String(clusters.length).padStart(2, "0")}
+          value={
+            <Counter
+              value={clusters.length}
+              minDigits={2}
+              fontSize="inherit"
+              fontWeight={600}
+            />
+          }
           detail="Local cluster records"
           icon={<Icons.Layers3 size={17} />}
           tone="green"
         />
         <UI.Stat
           label="Nodes online"
-          value={String(online).padStart(2, "0")}
+          value={
+            <Counter
+              value={online}
+              minDigits={2}
+              fontSize="inherit"
+              fontWeight={600}
+            />
+          }
           detail={`of ${nodes.length} · sample status`}
           icon={<Icons.Server size={17} />}
           tone="blue"
         />
         <UI.Stat
           label="Alerts"
-          value={String(warning).padStart(2, "0")}
+          value={
+            <Counter
+              value={warning}
+              minDigits={2}
+              fontSize="inherit"
+              fontWeight={600}
+            />
+          }
           detail="Sample health signals"
           icon={<Icons.Activity size={17} />}
           tone="purple"
         />
         <UI.Stat
           label="Average CPU"
-          value={`${avgCpu}%`}
+          value={
+            <Counter
+              value={avgCpu}
+              suffix="%"
+              fontSize="inherit"
+              fontWeight={600}
+            />
+          }
           detail={`${cluster?.name ?? "Active cluster"} · sample`}
           icon={<Icons.Cpu size={17} />}
           tone="blue"
         />
         <UI.Stat
           label="AI agents"
-          value={String(
-            agentEntities.filter((agent) => agent.kind === "agent").length,
-          ).padStart(2, "0")}
+          value={
+            <Counter
+              value={
+                agentEntities.filter((agent) => agent.kind === "agent").length
+              }
+              minDigits={2}
+              fontSize="inherit"
+              fontWeight={600}
+            />
+          }
           detail="Persisted local agent records"
           icon={<Icons.Bot size={17} />}
           tone="amber"

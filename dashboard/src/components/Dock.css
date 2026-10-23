@@ -1,0 +1,119 @@
+.quick-dock {
+  position: fixed;
+  z-index: 8;
+  right: max(24px, env(safe-area-inset-right));
+  bottom: max(48px, env(safe-area-inset-bottom));
+  left: calc(248px + (100vw - 248px) / 2);
+  display: flex;
+  width: max-content;
+  max-width: calc(100vw - 290px);
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 7px;
+  transform: translateX(-50%);
+  border: 1px solid rgb(161 207 208 / 15%);
+  border-radius: 16px;
+  background: rgb(13 23 29 / 86%);
+  box-shadow:
+    0 12px 40px rgb(0 0 0 / 38%),
+    inset 0 1px rgb(255 255 255 / 5%);
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
+  backdrop-filter: blur(18px) saturate(1.35);
+}
+.quick-dock__item {
+  position: relative;
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  color: #8c9ca7;
+  transition:
+    transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    color 160ms ease,
+    background 160ms ease;
+}
+.quick-dock__item:hover,
+.quick-dock__item:focus-visible {
+  z-index: 1;
+  transform: translateY(-5px) scale(1.12);
+  color: #dff8ee;
+  background: #17342f;
+}
+.quick-dock__item:hover + .quick-dock__item,
+.quick-dock__item:has(+ .quick-dock__item:hover) {
+  transform: translateY(-2px) scale(1.04);
+}
+.quick-dock__item.is-active {
+  color: #6ed9ad;
+  background: #142923;
+  border-color: rgb(98 211 165 / 20%);
+}
+.quick-dock__item.is-active::after {
+  position: absolute;
+  bottom: -4px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #6ed9ad;
+  content: "";
+}
+.quick-dock__label {
+  position: absolute;
+  bottom: calc(100% + 9px);
+  left: 50%;
+  padding: 6px 8px;
+  border: 1px solid #293b45;
+  border-radius: 6px;
+  background: #111b22;
+  color: #dce5eb;
+  font-size: 10px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 3px);
+  transition:
+    opacity 140ms ease,
+    transform 140ms ease;
+}
+.quick-dock__item:hover .quick-dock__label,
+.quick-dock__item:focus-visible .quick-dock__label {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+@media (max-width: 820px) {
+  .quick-dock {
+    right: 10px;
+    bottom: max(44px, env(safe-area-inset-bottom));
+    left: 50%;
+    max-width: calc(100vw - 76px);
+    gap: 2px;
+    padding: 5px;
+  }
+  .quick-dock__item {
+    width: 30px;
+    height: 32px;
+    flex-basis: 30px;
+  }
+  .quick-dock__item svg {
+    width: 15px;
+    height: 15px;
+  }
+  .quick-dock__label {
+    display: none;
+  }
+}
+@media (max-width: 600px) {
+  .quick-dock__item:nth-child(n + 9) {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .quick-dock__item,
+  .quick-dock__label {
+    transition: none;
+  }
+}
