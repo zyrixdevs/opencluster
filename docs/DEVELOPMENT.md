@@ -2,7 +2,7 @@
 
 ## Current status
 
-OpenCluster is implementing Phase 1: a standalone dashboard that runs locally with mock data. No backend, authentication service, database, node agent, remote execution, or cloud service is part of this phase.
+OpenCluster Phase 1 is the permanent standalone dashboard in `dashboard/`. It uses a validated IndexedDB provider for local records and localStorage for non-sensitive preferences. Seeded hardware telemetry is sample data. No backend, authentication service, node agent, remote execution, or cloud service is part of this phase.
 
 ## Prerequisites
 
@@ -11,7 +11,7 @@ OpenCluster is implementing Phase 1: a standalone dashboard that runs locally wi
 - Python 3.12 or later for documentation checks (standard library only)
 - Codex CLI only if you intend to use the project-local custom agents
 
-PostgreSQL, Redis, Docker, Kubernetes, credentials, and cloud services are not required to run the dashboard.
+PostgreSQL, Redis, Docker, Kubernetes, credentials, and cloud services are not required to run the dashboard. The browser uses IndexedDB for structured local dashboard data.
 
 ## Local workflow
 
@@ -41,7 +41,7 @@ Use Conventional Commits (for example `docs: clarify node enrollment proposal`).
 
 ## Dashboard architecture and motion
 
-Each page is loaded on demand. Mock domain data remains local to the typed data layer; browser storage holds only display preferences. Agents and Automation are interactive SVG/HTML mock canvases and never invoke external services. Mission Control's optional 3D globe is lazy-loaded and has a selectable-node fallback when WebGL is unavailable. See [Dashboard Motion and Performance](DASHBOARD_PERFORMANCE.md) for the animation responsibilities, tab-visibility pause, reduced-motion handling, and current limits.
+Each page is loaded on demand. Pages read structured records through the data access layer; IndexedDB stores local clusters, nodes, agent entities, workflows, task records, and sample telemetry. Browser storage holds only preferences. Agents and Automation are editable React Flow canvases and never invoke external services. Mission Control's optional 3D globe is lazy-loaded and has a selectable-node fallback when WebGL is unavailable. See [Dashboard Motion and Performance](DASHBOARD_PERFORMANCE.md) for animation responsibilities, tab-visibility pause, reduced-motion handling, and current limits.
 
 ## Codex agents
 

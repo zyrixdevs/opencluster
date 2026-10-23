@@ -6,6 +6,28 @@
   color: var(--agent-ink);
 }
 
+.agents-config-form {
+  display: grid;
+  gap: 9px;
+  margin: 12px 0;
+}
+
+.agents-config-form label {
+  display: grid;
+  gap: 5px;
+  color: var(--agent-muted);
+  font-size: 10px;
+}
+
+.agents-config-form input {
+  min-width: 0;
+  padding: 8px 9px;
+  border: 1px solid var(--agent-line);
+  border-radius: 6px;
+  color: var(--agent-ink);
+  background: rgba(2, 8, 12, 0.34);
+}
+
 .agents-demo-tag,
 .agents-summary-indicator,
 .agents-status-chip {
@@ -212,6 +234,151 @@
   background:
     radial-gradient(ellipse at 46% 44%, rgba(34, 98, 88, 0.12), transparent 45%),
     linear-gradient(145deg, rgba(8, 16, 21, 0.2), rgba(9, 17, 23, 0.78));
+}
+
+.agents-reactflow {
+  min-height: 510px;
+  height: clamp(510px, 54vw, 680px);
+  background:
+    radial-gradient(ellipse at 46% 44%, rgba(34, 98, 88, 0.12), transparent 45%),
+    linear-gradient(145deg, rgba(8, 16, 21, 0.2), rgba(9, 17, 23, 0.78));
+}
+
+.agents-reactflow .react-flow__background pattern circle {
+  fill: rgba(115, 153, 161, 0.2);
+}
+
+.agents-reactflow .react-flow__controls,
+.agents-reactflow .react-flow__minimap {
+  overflow: hidden;
+  border: 1px solid rgba(124, 155, 165, 0.18);
+  border-radius: 7px;
+  background: rgba(8, 15, 20, 0.92);
+}
+
+.agents-reactflow .react-flow__controls-button {
+  border-bottom: 1px solid rgba(124, 155, 165, 0.12);
+  background: transparent;
+  fill: #a9bcc2;
+}
+
+.agents-reactflow .react-flow__edge-textbg {
+  fill: #0d171c;
+}
+
+.agents-reactflow .react-flow__node-agent {
+  width: 172px;
+  border: 0;
+  background: transparent;
+}
+
+.agent-flow-card {
+  position: relative;
+  min-height: 92px;
+  padding: 14px 12px 10px 48px;
+  border: 1px solid rgba(128, 159, 166, 0.34);
+  border-radius: 11px;
+  background: linear-gradient(145deg, #16252c, #101a20);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.38);
+  color: #e2ecec;
+}
+
+.agent-flow-card.selected,
+.react-flow__node.selected .agent-flow-card {
+  border-color: rgba(124, 211, 180, 0.78);
+  box-shadow:
+    0 0 0 2px rgba(124, 211, 180, 0.11),
+    0 10px 24px rgba(0, 0, 0, 0.38);
+}
+
+.agent-flow-icon {
+  position: absolute;
+  top: 20px;
+  left: 11px;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(103, 196, 159, 0.25);
+  border-radius: 7px;
+  color: #8edcba;
+  background: rgba(103, 196, 159, 0.12);
+}
+
+.agent-flow-card.peach .agent-flow-icon {
+  color: #efb68f;
+  background: rgba(241, 173, 125, 0.12);
+}
+.agent-flow-card.violet .agent-flow-icon {
+  color: #b6a0f3;
+  background: rgba(176, 151, 243, 0.12);
+}
+.agent-flow-card.blue .agent-flow-icon {
+  color: #7bbde9;
+  background: rgba(104, 179, 236, 0.12);
+}
+.agent-flow-card.gold .agent-flow-icon {
+  color: #dfbf7d;
+  background: rgba(229, 191, 121, 0.12);
+}
+.agent-flow-card small,
+.agent-flow-card strong,
+.agent-flow-card em {
+  display: block;
+}
+.agent-flow-card small {
+  color: #84969d;
+  font: 500 7px var(--mono);
+  letter-spacing: 0.8px;
+}
+.agent-flow-card strong {
+  margin-top: 6px;
+  font: 600 11px var(--display);
+}
+.agent-flow-card em {
+  margin-top: 5px;
+  color: #788e96;
+  font: normal 6.5px var(--mono);
+  letter-spacing: 0.55px;
+}
+.agent-flow-status {
+  position: absolute;
+  top: 11px;
+  right: 11px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #67d2a5;
+  box-shadow: 0 0 8px rgba(103, 210, 165, 0.48);
+}
+.agent-flow-status.idle {
+  background: #8d9ba4;
+  box-shadow: none;
+}
+.agent-flow-status.attention {
+  background: #e5b76b;
+}
+.agent-flow-status.paused {
+  background: #7b8490;
+  box-shadow: none;
+}
+.agents-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.agents-fit-button {
+  min-height: 29px;
+  padding: 0 9px;
+  border: 1px solid rgba(124, 155, 165, 0.18);
+  border-radius: 5px;
+  color: #a9bcc2;
+  background: rgba(8, 15, 20, 0.65);
+  font-size: 9px;
+}
+.agents-fit-button:hover {
+  color: #dcf1e9;
+  border-color: rgba(121, 194, 171, 0.36);
 }
 
 .agents-graph {
@@ -701,6 +868,44 @@
   color: #788a92;
   font-size: 9px;
   line-height: 1.5;
+}
+
+.agents-directory {
+  margin-top: 15px;
+  padding-top: 12px;
+  border-top: 1px solid var(--agent-line);
+}
+
+.agents-directory > button {
+  width: 100%;
+  min-height: 34px;
+  padding: 5px 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  color: #c4d1d3;
+  text-align: left;
+  background: transparent;
+  font-size: 9px;
+}
+
+.agents-directory > button:hover,
+.agents-directory > button[aria-pressed="true"] {
+  border-color: rgba(114, 166, 153, 0.16);
+  background: rgba(26, 43, 43, 0.42);
+}
+
+.agents-directory > button > span:last-child {
+  flex: 1;
+}
+
+.agents-directory small {
+  display: block;
+  margin-top: 2px;
+  color: #687b84;
+  font-size: 8px;
 }
 
 .agents-demo-action {

@@ -8,17 +8,35 @@ import { handleDialogKeyDown, NodeRow } from "./shared";
 export function NodesPage() {
   const { nodes, cluster } = useDemoData();
   const selectedId = useDashboardStore((s) => s.selectedNodeId);
+  const allNodes = useDashboardStore((s) => s.nodes);
+  const clusters = useDashboardStore((s) => s.clusters);
   const select = useDashboardStore((s) => s.selectNode);
   const toggleCoordinator = useDashboardStore((s) => s.toggleCoordinator);
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
-  const visible = nodes.filter(
-    (node) =>
-      (filter === "all" || node.health === filter) &&
-      `${node.name} ${node.host} ${node.os}`
-        .toLowerCase()
-        .includes(search.toLowerCase()),
-  );
+  const [role, setRole] = useState("all");
+  const [os, setOs] = useState("all");
+  const [scope, setScope] = useState("active");
+  const [sort, setSort] = useState("name");
+  const visible = allNodes
+    .filter(
+      (node) =>
+        (scope === "all" ||
+          node.clusterId === (scope === "active" ? cluster?.id : scope)) &&
+        (filter === "all" || node.health === filter) &&
+        (role === "all" || node.role === role) &&
+        (os === "all" || node.os.toLowerCase().includes(os.toLowerCase())) &&
+        `${node.name} ${node.host} ${node.os}`
+          .toLowerCase()
+          .includes(search.toLowerCase()),
+    )
+    .sort((a, b) =>
+      sort === "cpu"
+        ? b.cpu - a.cpu
+        : sort === "memory"
+          ? b.memory - a.memory
+          : a.name.localeCompare(b.name),
+    );
   const selected = nodes.find((node) => node.id === selectedId);
   return (
     <>
@@ -82,6 +100,57 @@ export function NodesPage() {
               <option value="healthy">Healthy</option>
               <option value="warning">Attention</option>
               <option value="offline">Offline</option>
+            </select>
+            <select
+              className="select-pill"
+              aria-label="Filter nodes by role"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+            >
+              <option value="all">All roles</option>
+              <option value="coordinator">Coordinator</option>
+              <option value="worker">Worker</option>
+            </select>
+            <select
+              className="select-pill"
+              aria-label="Filter nodes by operating system"
+              value={os}
+              onChange={(e) => setOs(e.target.value)}
+            >
+              <option value="all">All systems</option>
+              {[
+                ...new Set(allNodes.map((node) => node.os.split(" · ")[0])),
+              ].map((system) => (
+                <option key={system} value={system}>
+                  {system}
+                </option>
+              ))}
+            </select>
+            <select
+              className="select-pill"
+              aria-label="Filter nodes by cluster"
+              value={scope}
+              onChange={(e) => setScope(e.target.value)}
+            >
+              <option value="active">Active cluster</option>
+              <option value="all">All clusters</option>
+              {clusters
+                .filter((item) => item.id !== cluster?.id)
+                .map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.name}
+                  </option>
+                ))}
+            </select>
+            <select
+              className="select-pill"
+              aria-label="Sort nodes"
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+            >
+              <option value="name">Sort by name</option>
+              <option value="cpu">Highest CPU</option>
+              <option value="memory">Highest memory</option>
             </select>
           </div>
         </div>
@@ -207,18 +276,30 @@ export function NodesPage() {
                     title={`${health} demo sample ${index + 1}`}
                   />
                 ))}
+                {!visible.length && (
+                  <tr>
+                    <td colSpan={7} className="table-empty">
+                      No nodes match these filters.
+                    </td>
+                  </tr>
+                )}
               </fieldset>
             </div>
             <div className="drawer-section">
               <h3>Node role</h3>
               <p>
-                Coordinator selection changes only the local demo visualization.
+                Role changes apply only to this browser-local cluster record.
               </p>
-              <UI.Button onClick={() => toggleCoordinator(selected.id)}>
-                {selected.role === "coordinator"
-                  ? "Designate as worker"
-                  : "Designate as coordinator"}
-              </UI.Button>
+              {selected.role === "coordinator" ? (
+                <span className="selected-tag">
+                  Current cluster coordinator
+                </span>
+              ) : (
+                <UI.Button onClick={() => void toggleCoordinator(selected.id)}>
+                  Designate as coordinator
+                </UI.Button>
+              )}
+              {/* ORIGINAL (preserved, not deleted — disabled by comment): <UI.Button onClick={() => toggleCoordinator(selected.id)}>{selected.role === "coordinator" ? "Designate as worker" : "Designate as coordinator"}</UI.Button> */}
             </div>
             <div className="demo-note">
               <Icons.CircleAlert size={14} /> Demo profile. No host telemetry is

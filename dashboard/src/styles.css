@@ -1,5 +1,37 @@
 @import "tailwindcss";
 
+.app-bootstrap,
+.app-error {
+  min-height: 100vh;
+  display: grid;
+  place-content: center;
+  gap: 12px;
+  padding: 24px;
+  color: #dce5eb;
+  background: #080d12;
+  text-align: center;
+}
+.data-storage-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border: 1px solid #8d4549;
+  border-radius: 8px;
+  color: #ffd9d9;
+  background: #381d22;
+  font-size: 12px;
+}
+.data-storage-error button {
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: inherit;
+}
+
 :root {
   font-family:
     "Inter Variable", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
@@ -865,7 +897,7 @@ a {
 }
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 13px;
   margin-bottom: 17px;
 }

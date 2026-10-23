@@ -22,6 +22,7 @@ export function HologramVisual() {
   const root = useRef<HTMLDivElement>(null);
   const demoMotion = useDashboardStore((state) => state.demoMotion);
   const performanceMode = useDashboardStore((state) => state.performanceMode);
+  const cinematicMotion = useDashboardStore((state) => state.cinematicMotion);
   const reducedMotion = useReducedMotion();
 
   useEffect(() => {
@@ -31,10 +32,40 @@ export function HologramVisual() {
     const context = gsap.context(() => {
       timeline = gsap
         .timeline({ repeat: -1, yoyo: true, defaults: { ease: "sine.inOut" } })
-        .to(".holo-orbit-outer", { rotation: 13, duration: 8 }, 0)
-        .to(".holo-orbit-inner", { rotation: -18, duration: 7 }, 0)
-        .to(".holo-core-glow", { opacity: 0.72, scale: 1.12, duration: 3 }, 0)
-        .to(".holo-signal", { opacity: 0.35, stagger: 0.16, duration: 1.3 }, 0);
+        .to(
+          ".holo-orbit-outer",
+          {
+            rotation: cinematicMotion ? 22 : 13,
+            duration: cinematicMotion ? 6 : 8,
+          },
+          0,
+        )
+        .to(
+          ".holo-orbit-inner",
+          {
+            rotation: cinematicMotion ? -28 : -18,
+            duration: cinematicMotion ? 5 : 7,
+          },
+          0,
+        )
+        .to(
+          ".holo-core-glow",
+          {
+            opacity: cinematicMotion ? 0.88 : 0.72,
+            scale: cinematicMotion ? 1.2 : 1.12,
+            duration: cinematicMotion ? 2.4 : 3,
+          },
+          0,
+        )
+        .to(
+          ".holo-signal",
+          {
+            opacity: 0.35,
+            stagger: cinematicMotion ? 0.11 : 0.16,
+            duration: 1.3,
+          },
+          0,
+        );
     }, root);
     const visibility = () =>
       document.hidden ? timeline?.pause() : timeline?.play();
@@ -43,7 +74,7 @@ export function HologramVisual() {
       document.removeEventListener("visibilitychange", visibility);
       context.revert();
     };
-  }, [demoMotion, performanceMode, reducedMotion]);
+  }, [cinematicMotion, demoMotion, performanceMode, reducedMotion]);
 
   return (
     <div

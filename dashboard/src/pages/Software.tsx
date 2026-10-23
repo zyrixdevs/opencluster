@@ -1,16 +1,25 @@
+import { useQueryClient } from "@tanstack/react-query";
 import * as Icons from "lucide-react";
 import type { CSSProperties } from "react";
 import { useEffect, useState } from "react";
 import * as UI from "../components/ui";
-import { softwareCatalog } from "../data/mock";
-import { useDemoData } from "../data/useDashboardData";
+import { dashboardProvider } from "../data/provider";
+import type { Software, SoftwareConfig } from "../data/models";
+import { useDemoData, useLocalCollection } from "../data/useDashboardData";
 import { handleDialogKeyDown } from "./shared";
 
 export function SoftwarePage() {
   const { nodes } = useDemoData();
+  const { data: softwareCatalog = [] } =
+    useLocalCollection<Software>("software-catalog");
+  const { data: savedConfigs = [] } =
+    useLocalCollection<SoftwareConfig>("software-configs");
   const [softwareId, setSoftwareId] = useState<string | null>(null);
   const [selectedNode, setSelectedNode] = useState(nodes[0]?.id ?? "");
-  const [configured, setConfigured] = useState<string[]>([]);
+  const [profile, setProfile] = useState("default-local");
+  const [saveError, setSaveError] = useState("");
+  const queryClient = useQueryClient();
+  const configured = savedConfigs.map((config) => config.softwareId);
   useEffect(() => {
     if (!nodes.some((node) => node.id === selectedNode)) {
       setSelectedNode(nodes[0]?.id ?? "");
@@ -72,7 +81,10 @@ export function SoftwarePage() {
             </div>
             <UI.Button
               className="software-action"
-              onClick={() => setSoftwareId(software.id)}
+              onClick={() => {
+                setSoftwareId(software.id);
+                setSaveError("");
+              }}
             >
               {configured.includes(software.id)
                 ? "View demo configuration"
@@ -161,10 +173,13 @@ export function SoftwarePage() {
             </label>
             <label>
               Configuration profile
-              <select>
-                <option>Default demo profile</option>
-                <option>Restricted preview</option>
-                <option>Developer sandbox</option>
+              <select
+                value={profile}
+                onChange={(event) => setProfile(event.target.value)}
+              >
+                <option value="default-local">Default local profile</option>
+                <option value="restricted-preview">Restricted preview</option>
+                <option value="developer-sandbox">Developer sandbox</option>
               </select>
             </label>
             <label className="check-label">
@@ -175,16 +190,37 @@ export function SoftwarePage() {
               <UI.Button onClick={() => setSoftwareId(null)}>Cancel</UI.Button>
               <UI.Button
                 variant="primary"
+                disabled={!selectedNode}
                 onClick={() => {
-                  setConfigured((value) =>
-                    value.includes(item.id) ? value : [...value, item.id],
-                  );
-                  setSoftwareId(null);
+                  const config = {
+                    id: item.id,
+                    softwareId: item.id,
+                    nodeId: selectedNode,
+                    profile,
+                  };
+                  void dashboardProvider.softwareConfigurations
+                    .update(item.id, config)
+                    .then(() => {
+                      void queryClient.invalidateQueries({
+                        queryKey: ["local-records", "software-configs"],
+                      });
+                      setSoftwareId(null);
+                    })
+                    .catch(() =>
+                      setSaveError(
+                        "Configuration could not be saved in this browser.",
+                      ),
+                    );
                 }}
               >
-                Save demo configuration
+                Save local configuration
               </UI.Button>
             </div>
+            {saveError && (
+              <p className="form-error" role="alert">
+                {saveError}
+              </p>
+            )}
           </section>
         </div>
       )}

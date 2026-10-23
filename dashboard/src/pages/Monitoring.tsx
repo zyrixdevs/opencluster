@@ -4,26 +4,32 @@ import { Link } from "react-router-dom";
 import { ResourceChart } from "../components/Charts";
 import { Card, HealthBadge, PageTitle, Progress } from "../components/ui";
 import { useDemoData } from "../data/useDashboardData";
+import { useDashboardStore } from "../state/useDashboardStore";
 
 export function MonitoringPage() {
   const { nodes } = useDemoData();
-  const [range, setRange] = useState("24h");
+  const storageAverage = nodes.length
+    ? Math.round(nodes.reduce((sum, node) => sum + node.disk, 0) / nodes.length)
+    : 0;
+  const [range, setRange] = useState<"15m" | "1h" | "24h" | "7d">("24h");
   const [metric, setMetric] = useState("cpu");
+  const [compare, setCompare] = useState(false);
+  const selectNode = useDashboardStore((state) => state.selectNode);
   return (
     <>
       <PageTitle
         eyebrow="OBSERVABILITY"
         title="Monitoring"
-        description="Historical demo metrics from a fixed sample data set."
+        description="Sample hardware metrics stored locally until a telemetry service is connected."
         actions={
           <select
             className="select-pill"
             value={range}
-            onChange={(e) => setRange(e.target.value)}
+            onChange={(e) => setRange(e.target.value as typeof range)}
             aria-label="Select time range"
           >
+            <option value="15m">Last 15 minutes</option>
             <option value="1h">Last hour</option>
-            <option value="6h">Last 6 hours</option>
             <option value="24h">Last 24 hours</option>
             <option value="7d">Last 7 days</option>
           </select>
@@ -34,7 +40,7 @@ export function MonitoringPage() {
           <span className="live-dot" /> SAMPLE HISTORY
         </span>
         <span>·</span>
-        <span>Range selection changes the displayed label only.</span>
+        <span>Fixed deterministic sample series · {range} window</span>
       </div>
       <div className="monitoring-grid">
         <Card className="monitoring-main-chart">
@@ -60,18 +66,27 @@ export function MonitoringPage() {
                   {key}
                 </button>
               ))}
+              {metric === "cpu" && (
+                <button
+                  type="button"
+                  aria-pressed={compare}
+                  className={compare ? "active" : ""}
+                  onClick={() => setCompare((value) => !value)}
+                >
+                  Compare memory
+                </button>
+              )}
             </div>
           </div>
           <div className="monitoring-chart">
             <ResourceChart
               metric={metric as "cpu" | "memory" | "network"}
-              range={range as "1h" | "6h" | "24h" | "7d"}
+              range={range}
+              compareMemory={compare}
             />
           </div>
           <div className="chart-foot">
-            <span>
-              Fixed illustrative pattern · reindexed for the selected range
-            </span>
+            <span>Deterministic illustrative samples · no live telemetry</span>
             <span>Units: {metric === "network" ? "Mb/s" : "%"}</span>
           </div>
         </Card>
@@ -85,19 +100,20 @@ export function MonitoringPage() {
           </div>
           <div className="storage-total">
             <b>
-              2.8 <small>TB</small>
+              {storageAverage}
+              <small>%</small>
             </b>
-            <span>of 6.4 TB allocated</span>
+            <span>average across {nodes.length} sample nodes</span>
           </div>
-          <Progress value={44} tone="blue" />
+          <Progress value={storageAverage} tone="blue" />
           <div className="storage-legend">
             <span>
               <i className="legend-dot cpu-dot" />
-              Used <b>44%</b>
+              Used <b>{storageAverage}%</b>
             </span>
             <span>
               <i className="legend-dot neutral-dot" />
-              Available <b>56%</b>
+              Available <b>{100 - storageAverage}%</b>
             </span>
           </div>
           <div className="storage-row-list">
@@ -125,24 +141,29 @@ export function MonitoringPage() {
           </div>
           <div className="health-summary-list">
             {nodes.map((node) => (
-              <div className="health-summary-row" key={node.id}>
+              <Link
+                className="health-summary-row"
+                key={node.id}
+                to="/nodes"
+                onClick={() => selectNode(node.id)}
+              >
                 <span className={`node-indicator ${node.health}`} />
                 <div>
                   <b>{node.name}</b>
                   <small>{node.host}</small>
                 </div>
                 <HealthBadge health={node.health} />
-              </div>
+              </Link>
             ))}
           </div>
         </Card>
         <Card className="monitoring-note">
           <CircleAlert size={16} />
           <div>
-            <b>Demo monitoring</b>
+            <b>Sample monitoring</b>
             <p>
-              Charts use static values created for interface preview. No
-              telemetry service is connected and freshness does not update.
+              Charts read persisted sample telemetry. No telemetry service is
+              connected and freshness does not update.
             </p>
           </div>
         </Card>

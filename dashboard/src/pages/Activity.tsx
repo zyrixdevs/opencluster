@@ -1,10 +1,18 @@
 import * as Icons from "lucide-react";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import * as UI from "../components/ui";
-import { initialActivity } from "../data/mock";
+import type { ActivityEvent } from "../data/models";
+import { useLocalCollection } from "../data/useDashboardData";
 import { ActivityLine } from "./shared";
 
 export function ActivityPage() {
+  const {
+    data: initialActivity = [],
+    isPending,
+    isError,
+  } = useLocalCollection<ActivityEvent>("activity");
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [severity, setSeverity] = useState("all");
   const [source, setSource] = useState("all");
@@ -72,7 +80,19 @@ export function ActivityPage() {
         <div className="activity-date-label">
           DEMO EVENTS <span /> FIXED SAMPLE HISTORY
         </div>
-        {events.length ? (
+        {isPending ? (
+          <UI.LoadingState label="Loading local activity records…" />
+        ) : isError ? (
+          <UI.ErrorState
+            title="Activity could not be loaded"
+            detail="The local event records are unavailable. Retry to load this view again."
+            onRetry={() =>
+              void queryClient.invalidateQueries({
+                queryKey: ["local-records", "activity"],
+              })
+            }
+          />
+        ) : events.length ? (
           events.map((event) => <ActivityLine event={event} key={event.id} />)
         ) : (
           <div className="no-results">

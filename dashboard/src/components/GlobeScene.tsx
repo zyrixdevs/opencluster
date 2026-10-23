@@ -45,6 +45,7 @@ export function GlobeScene({ nodes }: { nodes: Node[] }) {
   const selectNode = useDashboardStore((state) => state.selectNode);
   const demoMotion = useDashboardStore((state) => state.demoMotion);
   const performanceMode = useDashboardStore((state) => state.performanceMode);
+  const visualQuality = useDashboardStore((state) => state.visualQuality);
   const reducedMotion = useReducedMotion();
   const animate = demoMotion && !performanceMode && !reducedMotion;
 
@@ -135,7 +136,10 @@ export function GlobeScene({ nodes }: { nodes: Node[] }) {
     });
     setFailed(false);
     renderer.setPixelRatio(
-      Math.min(window.devicePixelRatio || 1, performanceMode ? 1 : 1.5),
+      Math.min(
+        window.devicePixelRatio || 1,
+        performanceMode ? 1 : visualQuality === "high" ? 2 : 1.5,
+      ),
     );
     renderer.setClearColor(0x000000, 0);
     host.appendChild(renderer.domElement);
@@ -248,7 +252,7 @@ export function GlobeScene({ nodes }: { nodes: Node[] }) {
       renderer.domElement.remove();
       cameraRef.current = null;
     };
-  }, [nodes, animate, performanceMode, selectNode]);
+  }, [nodes, animate, performanceMode, visualQuality, selectNode]);
 
   const changeZoom = (delta: number) =>
     setZoom((value) => {

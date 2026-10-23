@@ -4,7 +4,7 @@
 
 ## Test layers
 
-- **Dashboard checks:** strict TypeScript typecheck, Biome lint, Vitest tests for demo-data cloning and local state transitions, and a Vite production build.
+- **Dashboard checks:** strict TypeScript typecheck, Biome lint, Vitest tests for IndexedDB validation/migration, graph and workflow behavior, and a Vite production build.
 - **Documentation/repository checks:** verify required documents, Markdown structure/links where tooling exists, and safe workflow configuration.
 - **Unit tests:** metric parsing, validation, authorization decisions, state transitions, and serialization.
 - **Contract tests:** frontend/API schemas and control-server/agent protocol compatibility.

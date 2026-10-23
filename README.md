@@ -9,13 +9,13 @@ OpenCluster is an open-source project by **ZYRIX DEVS**. Its long-term goal is a
 
 ## Current project status
 
-Phase 0 repository foundation is complete. Phase 1 is focused on a standalone web dashboard in `dashboard/`, using local mock data to demonstrate cluster operations and monitoring views. The application is still under development; the required pages and interactions are not claimed as complete until implemented and verified.
+Phase 0 repository foundation is complete. Phase 1 builds the permanent standalone dashboard in `dashboard/`, with validated browser-local records and a replaceable data-provider boundary. The application is still under development; the required pages and interactions are not claimed as complete until implemented and verified.
 
-The Phase 1 dashboard is a **demo interface only**. It does not connect to real clusters, run tasks, install software, or provide live telemetry. It has no backend, authentication service, database, or node agent, and does not require a cloud service.
+The Phase 1 dashboard is a **production frontend operating in local mode**. It supports persistent local cluster, node, graph, and workflow records. It does not connect to physical clusters, execute tasks, install software, or provide live telemetry until backend services and an authorized node agent exist. It does not require cloud services. Seeded hardware metrics are visibly identified as sample data.
 
 ## Dashboard scope
 
-The dashboard includes Home, Mission Control, Clusters, Nodes, Agents, Automation, AI Software, Tasks, Monitoring, Activity, and Settings views. Its cluster topology, metrics, agent/workflow canvases, task activity, and software installation previews use simulated data and actions. See the [Phase 1 product requirements](docs/PRD.md) for acceptance criteria and explicit limits.
+The dashboard includes Home, Mission Control, Clusters, Nodes, Agents, Automation, AI Software, Tasks, Monitoring, Activity, and Settings views. Cluster/node management and canvas editing operate on saved local records; hardware metrics are sample data, and installations or workload execution remain unavailable. The implementation requirements are in the [dashboard PRD](docs/DASHBOARD_PRD.md), [UI/UX specification](docs/DASHBOARD_UI_UX_SPEC.md), and [architecture and component map](docs/DASHBOARD_ARCHITECTURE_AND_COMPONENT_MAP.md).
 
 ## Future direction
 
@@ -30,7 +30,7 @@ npm --prefix dashboard install
 npm --prefix dashboard run dev
 ```
 
-Vite prints the local URL when the server starts. The dashboard uses mock data only; no backend or cloud service is needed. Run the available checks and production build with:
+Vite prints the local URL when the server starts. The dashboard uses persistent browser-local records and sample hardware telemetry; no backend or cloud service is needed. Run the available checks and production build with:
 
 ```sh
 npm --prefix dashboard run typecheck
@@ -46,13 +46,14 @@ For repository contribution setup, read [AGENTS.md](AGENTS.md), the [development
 - [Product requirements](docs/PRD.md) · [Roadmap](docs/ROADMAP.md) · [Architecture proposal](docs/ARCHITECTURE.md)
 - [Technology stack](docs/TECH_STACK.md) · [Design system](docs/DESIGN_SYSTEM.md)
 - [Dashboard motion and performance](docs/DASHBOARD_PERFORMANCE.md)
+- [Dashboard product requirements](docs/DASHBOARD_PRD.md) · [UI/UX specification](docs/DASHBOARD_UI_UX_SPEC.md) · [Architecture and component map](docs/DASHBOARD_ARCHITECTURE_AND_COMPONENT_MAP.md)
 - [API design proposal](docs/API_DESIGN.md) · [Database design proposal](docs/DATABASE_DESIGN.md) · [Node protocol proposal](docs/NODE_PROTOCOL.md)
 - [Security architecture proposal](docs/SECURITY_ARCHITECTURE.md) · [Development](docs/DEVELOPMENT.md) · [Testing strategy](docs/TESTING_STRATEGY.md)
 - [Deployment proposal](docs/DEPLOYMENT.md) · [GitHub workflow](docs/GITHUB_WORKFLOW.md) · [Decisions](docs/DECISIONS.md)
 
 ## Contributing and security
 
-Contributions are welcome under [CONTRIBUTING.md](CONTRIBUTING.md). Please report security concerns through [SECURITY.md](SECURITY.md), not a public issue. Security proposals in the design documents do not mean corresponding protections are implemented in this demo dashboard.
+Contributions are welcome under [CONTRIBUTING.md](CONTRIBUTING.md). Please report security concerns through [SECURITY.md](SECURITY.md), not a public issue. The dashboard does not yet implement backend authentication, authorization, node enrollment, or remote-action protections because those services are not in Phase 1.
 
 ## License and attribution
 

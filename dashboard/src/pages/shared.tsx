@@ -117,15 +117,35 @@ export function ClusterModal({
   const target = clusters.find((c) => c.id === clusterId);
   const add = useDashboardStore((s) => s.addCluster);
   const update = useDashboardStore((s) => s.updateCluster);
+  const remove = useDashboardStore((s) => s.removeCluster);
   const [name, setName] = useState(target?.name ?? "");
   const [region, setRegion] = useState(target?.region ?? "Local network");
   const [description, setDescription] = useState(target?.description ?? "");
-  const submit = (e: FormEvent) => {
+  const [error, setError] = useState("");
+  const submit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) return;
-    if (target) update(target.id, { name: name.trim(), region, description });
-    else add(name, region, description);
-    close();
+    if (!name.trim()) {
+      setError("Enter a cluster name.");
+      return;
+    }
+    if (
+      clusters.some(
+        (cluster) =>
+          cluster.id !== target?.id &&
+          cluster.name.trim().toLowerCase() === name.trim().toLowerCase(),
+      )
+    ) {
+      setError("A cluster with this name already exists.");
+      return;
+    }
+    try {
+      if (target)
+        await update(target.id, { name: name.trim(), region, description });
+      else await add(name, region, description);
+      close();
+    } catch {
+      setError("Cluster changes could not be saved in this browser.");
+    }
   };
   return (
     <div className="modal-backdrop">
@@ -192,7 +212,39 @@ export function ClusterModal({
             onChange={(e) => setDescription(e.target.value)}
           />
         </label>
+        {error && (
+          <p className="form-error" role="alert">
+            {error}
+          </p>
+        )}
+        {target && (
+          <p className="muted">
+            Deleting this demo cluster moves its nodes to another cluster.
+          </p>
+        )}
         <div className="modal-actions">
+          {target && (
+            <UI.Button
+              type="button"
+              variant="danger"
+              onClick={async () => {
+                if (clusters.length < 2) {
+                  setError("Keep at least one demo cluster.");
+                  return;
+                }
+                if (
+                  window.confirm(
+                    `Delete ${target.name}? Its nodes will move to another cluster.`,
+                  )
+                ) {
+                  if (await remove(target.id)) close();
+                  else setError("Cluster could not be removed locally.");
+                }
+              }}
+            >
+              Delete
+            </UI.Button>
+          )}
           <UI.Button type="button" onClick={close}>
             Cancel
           </UI.Button>

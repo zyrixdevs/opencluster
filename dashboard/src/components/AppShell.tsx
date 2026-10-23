@@ -80,6 +80,12 @@ export function AppShell() {
   const demoMotion = useDashboardStore((s) => s.demoMotion);
   const compactDashboard = useDashboardStore((s) => s.compactDashboard);
   const performanceMode = useDashboardStore((s) => s.performanceMode);
+  const cinematicMotion = useDashboardStore((s) => s.cinematicMotion);
+  const displayName = useDashboardStore((s) => s.displayName);
+  const persistenceError = useDashboardStore((s) => s.persistenceError);
+  const clearPersistenceError = useDashboardStore(
+    (s) => s.clearPersistenceError,
+  );
   const prefersReducedMotion = useReducedMotion();
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -144,7 +150,7 @@ export function AppShell() {
   const openSearch = () => setSearchOpen(true);
   return (
     <div
-      className={`app-shell ${collapsed ? "sidebar-is-collapsed" : ""} ${compactDashboard ? "compact-dashboard" : ""} ${performanceMode ? "performance-mode" : ""}`}
+      className={`app-shell ${collapsed ? "sidebar-is-collapsed" : ""} ${compactDashboard ? "compact-dashboard" : ""} ${performanceMode ? "performance-mode" : ""} ${cinematicMotion && demoMotion && !prefersReducedMotion ? "cinematic-motion" : ""}`}
     >
       <aside className="sidebar" aria-label="Primary navigation">
         <div className="brand">
@@ -156,7 +162,7 @@ export function AppShell() {
           <div className="brand-word">
             <b>opencluster</b>
             <small>
-              CONTROL PLANE <i>DEMO</i>
+              LOCAL WORKSPACE <i>ACTIVE</i>
             </small>
           </div>
         </div>
@@ -207,8 +213,8 @@ export function AppShell() {
             <span />
           </div>
           <div>
-            <b>All systems nominal</b>
-            <small>Demo environment · sample data</small>
+            <b>Local workspace ready</b>
+            <small>Hardware metrics use sample records</small>
           </div>
         </div>
         <NavLink
@@ -223,8 +229,8 @@ export function AppShell() {
         <div className="sidebar-footer">
           <div className="avatar">OC</div>
           <div className="profile-copy">
-            <b>Demo operator</b>
-            <small>Local preview</small>
+            <b>{displayName}</b>
+            <small>Local profile</small>
           </div>
           <CircleHelp size={16} aria-label="Help" />
         </div>
@@ -272,6 +278,20 @@ export function AppShell() {
         </header>
         <div className="page-scroll">
           <div className="page-scroll-content">
+            {persistenceError && (
+              <div className="data-storage-error" role="alert">
+                <span>
+                  Local changes could not be saved: {persistenceError}
+                </span>
+                <button
+                  type="button"
+                  aria-label="Dismiss storage error"
+                  onClick={clearPersistenceError}
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            )}
             <motion.div
               key={location.pathname}
               className="page-transition"
@@ -289,11 +309,11 @@ export function AppShell() {
         </div>
         <footer className="app-footer">
           <span>
-            OpenCluster <b>DEMO MODE</b>
+            OpenCluster <b>LOCAL MODE</b>
           </span>
           <span>
-            All metrics are illustrative sample data <i>·</i> No infrastructure
-            is connected
+            Hardware telemetry uses seed data <i>·</i> Backend services are not
+            connected
           </span>
         </footer>
       </main>

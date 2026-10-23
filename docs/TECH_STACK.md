@@ -6,9 +6,9 @@
 |---|---|---|
 | Web | React, TypeScript, Vite in `dashboard/` | Standalone local app; no backend required for Phase 1. |
 | UI | Tailwind CSS, shadcn/ui component patterns, Lucide React; Sora + Inter self-hosted fonts | Utility-first styling and composable components; bundled fonts avoid runtime font CDN requests. |
-| Client data | TanStack Query for the mock data-access boundary; Zustand for local cross-view state | Preserve a replaceable data boundary without implying live server connectivity. |
-| Charts | Recharts | React-oriented charts; current charts display generated demo history. |
-| Motion and visualization | Framer Motion for route transitions, GSAP for the Home visual, Lenis for document scroll, Three.js for an optional lazy Mission Control globe; SVG for graph/workflow canvases | Each tool has a narrow role; respect reduced motion, pause scenes when hidden, and keep Three.js in a lazy route chunk. See [dashboard performance](DASHBOARD_PERFORMANCE.md). |
+| Client data | TanStack Query for the typed repository boundary and IndexedDB local provider; Zustand for lightweight cross-view state/preferences | Persistent local records now; future providers must not imply a live connection unless connected. |
+| Charts | Recharts | Charts display persisted sample telemetry until a monitoring provider exists. |
+| Motion and visualization | Framer Motion for route transitions, GSAP for the Home visual, Lenis for document scroll, Three.js for an optional lazy Mission Control globe; React Flow for editable agent/workflow canvases | Each tool has a narrow role; respect reduced motion, pause scenes when hidden, and keep heavy visualizations route-lazy. See [dashboard performance](DASHBOARD_PERFORMANCE.md). |
 | API | Python and FastAPI | Typed schemas and async support; concurrency and blocking work must be managed explicitly. |
 | Durable data | PostgreSQL | Transactions and relational integrity; time-series retention strategy remains open. |
 | Live updates | WebSockets | Interactive updates; requires authorization, reconnect, and backpressure design. |

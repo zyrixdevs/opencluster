@@ -63,6 +63,136 @@
   font-size: 11px;
   font-weight: 600;
 }
+.automation-name {
+  width: 190px;
+  border: 0;
+  padding: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text);
+  font: 600 11px inherit;
+}
+.automation-name:focus-visible {
+  outline: 1px solid #6bc8a1;
+  outline-offset: 3px;
+}
+.automation-palette {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  scrollbar-width: thin;
+}
+.automation-palette button {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid var(--border-light);
+  border-radius: 5px;
+  padding: 5px 7px;
+  background: #111b23;
+  color: #9aabb2;
+  font-size: 9px;
+  text-transform: capitalize;
+  cursor: pointer;
+}
+.automation-palette button:hover {
+  color: #bcebd7;
+  border-color: #3b6655;
+}
+.automation-reactflow {
+  height: 450px;
+  background:
+    radial-gradient(ellipse at 50% 42%, rgba(24, 65, 60, 0.14), transparent 61%),
+    #0a1117;
+}
+.automation-reactflow .react-flow__controls,
+.automation-reactflow .react-flow__minimap {
+  overflow: hidden;
+  border: 1px solid #2a3942;
+  border-radius: 7px;
+  background: #10191fdd;
+}
+.automation-reactflow .react-flow__controls-button {
+  background: #10191f;
+  fill: #91a1a8;
+  border-color: #2a3942;
+}
+.automation-reactflow .react-flow__node-default {
+  width: 188px;
+  border: 1px solid #35504e;
+  border-radius: 8px;
+  padding: 14px;
+  color: var(--text);
+  background: linear-gradient(150deg, #17232b, #101920);
+  box-shadow: 0 8px 24px #0005;
+}
+.automation-reactflow .react-flow__node-workflow {
+  width: 190px;
+  border: 1px solid #35504e;
+  border-radius: 8px;
+  color: var(--text);
+  background: linear-gradient(150deg, #17232b, #101920);
+  box-shadow: 0 8px 24px #0005;
+}
+.flow-card {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  gap: 5px 8px;
+  align-items: center;
+  padding: 12px;
+}
+.flow-card > span {
+  grid-row: span 2;
+  color: #7fd1ad;
+}
+.flow-card strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 10px;
+}
+.flow-card small {
+  color: #82939a;
+  font-size: 8px;
+  text-transform: uppercase;
+}
+.automation-reactflow .react-flow__node-workflow.selected {
+  border-color: #58b38b;
+  box-shadow:
+    0 0 0 1px #58b38b55,
+    0 9px 26px #0008;
+}
+.automation-reactflow .react-flow__node-default.selected {
+  border-color: #58b38b;
+  box-shadow:
+    0 0 0 1px #58b38b55,
+    0 9px 26px #0008;
+}
+.automation-reactflow .react-flow__handle {
+  width: 8px;
+  height: 8px;
+  border: 1px solid #12231d;
+  background: #6dd7a8;
+}
+.automation-reactflow .react-flow__edge-path {
+  stroke: #68b896;
+  stroke-width: 1.8;
+}
+.automation-reactflow .react-flow__edge-text {
+  fill: #9bb0aa;
+  font-size: 10px;
+}
+.automation-issues {
+  color: #e4b56b;
+  font-size: 10px;
+  line-height: 1.5;
+}
+.automation-issues p {
+  margin: 8px 0;
+}
 .automation-workflow-label small,
 .automation-path-item small,
 .preview-result small {

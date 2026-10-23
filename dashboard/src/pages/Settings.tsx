@@ -1,5 +1,6 @@
 import * as Icons from "lucide-react";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import * as UI from "../components/ui";
 import { useDashboardStore } from "../state/useDashboardStore";
 
@@ -7,18 +8,26 @@ export function SettingsPage() {
   const theme = useDashboardStore((s) => s.theme);
   const setTheme = useDashboardStore((s) => s.setTheme);
   const motion = useDashboardStore((s) => s.demoMotion);
-  const setMotion = useDashboardStore((s) => s.setMotion);
+  const setMotionMode = useDashboardStore((s) => s.setMotionMode);
+  const motionMode = useDashboardStore((s) => s.motionMode);
   const compact = useDashboardStore((s) => s.compactDashboard);
   const setCompactDashboard = useDashboardStore((s) => s.setCompactDashboard);
-  const performanceMode = useDashboardStore((s) => s.performanceMode);
-  const setPerformanceMode = useDashboardStore((s) => s.setPerformanceMode);
+  const setVisualQuality = useDashboardStore((s) => s.setVisualQuality);
+  const visualQuality = useDashboardStore((s) => s.visualQuality);
+  const displayName = useDashboardStore((s) => s.displayName);
+  const setDisplayName = useDashboardStore((s) => s.setDisplayName);
+  const cinematicMotion = useDashboardStore((s) => s.cinematicMotion);
+  const demoDataset = useDashboardStore((s) => s.demoDataset);
+  const setDemoDataset = useDashboardStore((s) => s.setDemoDataset);
+  const resetDemoData = useDashboardStore((s) => s.resetDemoData);
+  const queryClient = useQueryClient();
   const [saved, setSaved] = useState("");
   return (
     <>
       <UI.PageTitle
         eyebrow="PREFERENCES"
         title="Settings"
-        description="Customize this browser’s local demo experience."
+        description="Customize this local workspace. Preferences stay in this browser."
       />
       <div className="settings-layout">
         <div className="settings-nav">
@@ -36,7 +45,7 @@ export function SettingsPage() {
           </a>
           <a href="#demo">
             <Icons.Sparkles size={15} />
-            Demo data
+            Local data
           </a>
           <a href="#integrations">
             <Icons.Boxes size={15} />
@@ -76,6 +85,26 @@ export function SettingsPage() {
             </div>
             <div className="setting-row">
               <div>
+                <b>Cinematic motion</b>
+                <small>
+                  Enable enhanced decorative motion when motion is allowed.
+                </small>
+              </div>
+              <button
+                type="button"
+                className={`toggle ${cinematicMotion ? "on" : ""}`}
+                role="switch"
+                aria-checked={cinematicMotion}
+                aria-label="Cinematic motion"
+                onClick={() =>
+                  setMotionMode(cinematicMotion ? "system" : "cinematic")
+                }
+              >
+                <span />
+              </button>
+            </div>
+            <div className="setting-row">
+              <div>
                 <b>Reduce motion</b>
                 <small>Suppress interface animations for this browser.</small>
               </div>
@@ -85,7 +114,9 @@ export function SettingsPage() {
                 role="switch"
                 aria-checked={!motion}
                 aria-label="Reduce motion"
-                onClick={() => setMotion(!motion)}
+                onClick={() =>
+                  setMotionMode(motionMode === "reduced" ? "system" : "reduced")
+                }
               >
                 <span />
               </button>
@@ -122,16 +153,19 @@ export function SettingsPage() {
                 <b>Performance mode</b>
                 <small>Reduce blur and decorative motion effects.</small>
               </div>
-              <button
-                type="button"
-                className={`toggle ${performanceMode ? "on" : ""}`}
-                role="switch"
-                aria-checked={performanceMode}
-                aria-label="Performance mode"
-                onClick={() => setPerformanceMode(!performanceMode)}
+              <select
+                aria-label="Visual quality"
+                value={visualQuality}
+                onChange={(event) =>
+                  setVisualQuality(
+                    event.target.value as "auto" | "performance" | "high",
+                  )
+                }
               >
-                <span />
-              </button>
+                <option value="auto">Automatic</option>
+                <option value="performance">Performance</option>
+                <option value="high">High</option>
+              </select>
             </div>
           </UI.Card>
           <UI.Card id="accessibility" className="settings-card">
@@ -167,26 +201,89 @@ export function SettingsPage() {
                 <Icons.Sparkles size={17} />
               </div>
               <div>
-                <h2>Demo data</h2>
-                <p>Local sample data with non-sensitive browser preferences.</p>
+                <h2>Local data</h2>
+                <p>
+                  Records are stored in IndexedDB; display preferences use
+                  localStorage.
+                </p>
               </div>
             </div>
             <div className="demo-setting-note">
               <Icons.CircleAlert size={15} />
               <span>
-                Cluster and node data resets when this page is reloaded. Only
-                appearance and layout preferences are stored in this browser.
+                Seeded metrics are sample values. Cluster, node, workflow, and
+                graph records persist in this browser. No credentials or secrets
+                are stored.
               </span>
             </div>
             <div className="setting-row">
+              <label htmlFor="display-name">
+                <b>Home greeting</b>
+                <small>Choose the local display name shown on Home.</small>
+              </label>
+              <input
+                id="display-name"
+                maxLength={40}
+                value={displayName}
+                onChange={(event) => setDisplayName(event.target.value)}
+              />
+            </div>
+            <div className="setting-row">
+              <label htmlFor="demo-dataset">
+                <b>Seed dataset</b>
+                <small>
+                  Replace current cluster and node records with the selected
+                  seed.
+                </small>
+              </label>
+              <select
+                id="demo-dataset"
+                value={demoDataset}
+                onChange={(event) => {
+                  const next = event.target.value as
+                    | "multi-cluster"
+                    | "homelab-only";
+                  if (
+                    next !== demoDataset &&
+                    window.confirm(
+                      "Replace your current local clusters and nodes with this seed dataset?",
+                    )
+                  )
+                    void setDemoDataset(next).catch(() =>
+                      setSaved(
+                        "The selected local dataset could not be saved.",
+                      ),
+                    );
+                }}
+              >
+                <option value="multi-cluster">Multi-cluster demo</option>
+                <option value="homelab-only">Homelab only</option>
+              </select>
+            </div>
+            <div className="setting-row">
               <div>
-                <b>Reset demo data</b>
-                <small>Restore the original sample clusters and nodes.</small>
+                <b>Reset demo data and preferences</b>
+                <small>
+                  Restore the original sample content and default settings.
+                </small>
               </div>
               <UI.Button
-                onClick={() => {
-                  localStorage.removeItem("opencluster-demo-preferences");
-                  window.location.reload();
+                onClick={async () => {
+                  if (
+                    window.confirm(
+                      "Reset local clusters, nodes, workflows, graph layouts, and preferences? This cannot be undone.",
+                    )
+                  ) {
+                    try {
+                      await resetDemoData();
+                      await queryClient.invalidateQueries();
+                      setSaved("Sample records and preferences restored.");
+                    } catch {
+                      setSaved(
+                        "Local reset failed. Your records were not confirmed as reset.",
+                      );
+                    }
+                  }
                 }}
               >
                 Reset sample data
@@ -202,6 +299,16 @@ export function SettingsPage() {
                 <h2>Integrations</h2>
                 <p>Connection settings for future OpenCluster capabilities.</p>
               </div>
+            </div>
+            <div className="integration-placeholder">
+              <span className="integration-pip active" />
+              <div>
+                <b>Browser-local provider</b>
+                <small>
+                  Connected · IndexedDB records, localStorage preferences
+                </small>
+              </div>
+              <span className="availability-pill available">Active</span>
             </div>
             <div className="integration-placeholder">
               <span className="integration-pip" />

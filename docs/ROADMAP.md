@@ -9,15 +9,15 @@
 
 ## Phase 1 — Standalone dashboard (current)
 
-Build a responsive React, TypeScript, and Vite dashboard in `dashboard/`, backed only by typed mock data and local demo preferences.
+Build the permanent responsive React, TypeScript, and Vite dashboard in `dashboard/`, backed by typed local repositories and IndexedDB records. Seeded hardware telemetry remains sample data until a control plane is available.
 
 - Deliver Home, Mission Control, Clusters, Nodes, Agents, Automation, AI Software, Tasks, Monitoring, Activity, and Settings views.
-- Support useful demo interactions for cluster metadata, node selection, topology navigation, agent graph and workflow canvases, catalog previews, task controls, filters, and preferences.
+- Support persistent local cluster/node management, node selection, topology navigation, agent graph and workflow canvases, catalog previews, local task records, filters, and preferences.
 - Keep heavy scenes route-split and lazy-loaded; respect reduced-motion, performance, and tab visibility preferences.
 - Clearly label simulated data, task execution, and software installation previews.
 - Validate with the checked-in type checker, linter, tests, and production build; document local setup using actual package scripts.
 
-**Phase 1 exclusions:** backend, authentication services, database, node agent, real telemetry, remote commands, real software installation, real workload execution, and required cloud services. A completed dashboard is a demo interface, not a functioning infrastructure control plane.
+**Phase 1 exclusions:** backend, authentication services, server database, node agent, live telemetry, remote commands, real software installation, real workload execution, and required cloud services. Local record management is functional; backend-dependent infrastructure operations remain unavailable.
 
 ## Phase 2 — Control-plane design and foundation (future)
 

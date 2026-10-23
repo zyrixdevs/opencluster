@@ -7,7 +7,8 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { telemetry } from "../data/mock";
+import type { TelemetryPoint } from "../data/models";
+import { useLocalCollection } from "../data/useDashboardData";
 
 export function ResourceChart({
   metric = "cpu",
@@ -17,9 +18,11 @@ export function ResourceChart({
 }: {
   metric?: "cpu" | "memory" | "network";
   compact?: boolean;
-  range?: "1h" | "6h" | "24h" | "7d";
+  range?: "15m" | "1h" | "24h" | "7d";
   compareMemory?: boolean;
 }) {
+  const { data: telemetry = [] } =
+    useLocalCollection<TelemetryPoint>("telemetry");
   const series =
     metric === "network"
       ? [
@@ -37,20 +40,35 @@ export function ResourceChart({
     series.push({ key: "memory", name: "Memory", color: "#65b9ff" });
   }
   const visiblePoints =
-    range === "1h"
-      ? telemetry.slice(-2)
-      : range === "6h"
-        ? telemetry.slice(-7)
+    range === "15m"
+      ? telemetry.slice(-4)
+      : range === "1h"
+        ? telemetry.slice(-6)
         : telemetry;
-  const data = visiblePoints.map((point, index) => ({
+  const points =
+    range === "7d"
+      ? Array.from(
+          { length: 14 },
+          (_, index) => telemetry[Math.floor((index * telemetry.length) / 14)],
+        )
+      : visiblePoints;
+  const data = points.map((point, index) => ({
     ...point,
     time:
       range === "7d"
-        ? `Day ${index + 1}`
+        ? `Day ${Math.floor(index / 2) + 1}`
         : range === "1h"
-          ? `${index * 60} min`
-          : point.time,
+          ? `${index * 10} min`
+          : range === "15m"
+            ? `${index * 5} min`
+            : point.time,
   }));
+  if (!data.length)
+    return (
+      <div className="chart-empty" role="status">
+        No telemetry samples are stored locally.
+      </div>
+    );
   return (
     <div className={`chart-wrap ${compact ? "chart-compact" : ""}`}>
       <ResponsiveContainer width="100%" height="100%">

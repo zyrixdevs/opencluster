@@ -25,8 +25,8 @@ afterEach(() => {
 });
 
 describe("useDashboardStore", () => {
-  it("adds a trimmed demo cluster and selects it", () => {
-    useDashboardStore
+  it("adds a trimmed demo cluster and selects it", async () => {
+    await useDashboardStore
       .getState()
       .addCluster("  Research Lab  ", "Local network", "Demo only");
 
@@ -42,8 +42,19 @@ describe("useDashboardStore", () => {
     expect(state.selectedClusterId).toBe(added?.id);
   });
 
-  it("updates cluster metadata without changing other clusters", () => {
-    useDashboardStore.getState().updateCluster("cl-main", {
+  it("serializes concurrent local cluster additions without losing records", async () => {
+    const store = useDashboardStore.getState();
+    await Promise.all([
+      store.addCluster("First concurrent", "Local", ""),
+      store.addCluster("Second concurrent", "Local", ""),
+    ]);
+    expect(useDashboardStore.getState().clusters.map((item) => item.name)).toEqual(
+      expect.arrayContaining(["First concurrent", "Second concurrent"]),
+    );
+  });
+
+  it("updates cluster metadata without changing other clusters", async () => {
+    await useDashboardStore.getState().updateCluster("cl-main", {
       name: "Updated Core",
       description: "Updated",
     });
@@ -66,8 +77,8 @@ describe("useDashboardStore", () => {
     });
   });
 
-  it("makes only the selected node's cluster coordinator", () => {
-    useDashboardStore.getState().toggleCoordinator("node-02");
+  it("makes only the selected node's cluster coordinator", async () => {
+    await useDashboardStore.getState().toggleCoordinator("node-02");
 
     const nodes = useDashboardStore.getState().nodes;
     expect(nodes.find((node) => node.id === "node-02")?.role).toBe(
@@ -77,6 +88,37 @@ describe("useDashboardStore", () => {
     expect(nodes.find((node) => node.id === "node-05")?.role).toBe(
       "coordinator",
     );
+  });
+
+  it("moves a coordinator atomically and preserves one coordinator per nonempty cluster", async () => {
+    await useDashboardStore.getState().moveNode("node-01", "cl-edge");
+    const { clusters, nodes } = useDashboardStore.getState();
+    expect(nodes.find((node) => node.id === "node-01")).toMatchObject({
+      clusterId: "cl-edge",
+      role: "worker",
+    });
+    expect(nodes.find((node) => node.id === "node-02")?.role).toBe(
+      "coordinator",
+    );
+    expect(
+      nodes.filter(
+        (node) => node.clusterId === "cl-edge" && node.role === "coordinator",
+      ),
+    ).toHaveLength(1);
+    expect(
+      clusters.find((cluster) => cluster.id === "cl-main")?.nodeIds,
+    ).not.toContain("node-01");
+  });
+
+  it("removes a cluster atomically and preserves the fallback coordinator", async () => {
+    await expect(useDashboardStore.getState().removeCluster("cl-main")).resolves.toBe(true);
+    const { clusters, nodes } = useDashboardStore.getState();
+    expect(clusters.some((cluster) => cluster.id === "cl-main")).toBe(false);
+    expect(nodes.filter((node) => node.clusterId === "cl-edge" && node.role === "coordinator")).toHaveLength(1);
+    expect(nodes.find((node) => node.id === "node-01")).toMatchObject({
+      clusterId: "cl-edge",
+      role: "worker",
+    });
   });
 
   it("keeps selected node state out of persisted browser preferences", () => {

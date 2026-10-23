@@ -4,7 +4,7 @@
 
 ## Product vision
 
-OpenCluster aims to give self-hosters and small infrastructure teams one place to understand and eventually operate heterogeneous compute clusters. The long-term product is a self-hosted control plane. Phase 1 deliberately delivers only a standalone browser dashboard backed by local mock data, so contributors can establish the interaction model before any control-plane or node software exists.
+OpenCluster aims to give self-hosters and small infrastructure teams one place to understand and eventually operate heterogeneous compute clusters. The long-term product is a self-hosted control plane. Phase 1 delivers the permanent standalone browser dashboard, currently backed by a validated persistent local provider. Seeded hardware telemetry remains sample data; the UI is not a disposable prototype.
 
 ## Users and use cases
 
@@ -16,17 +16,17 @@ These use cases describe the dashboard experience. They do not imply connectivit
 
 ## Phase 1 scope: standalone dashboard
 
-The dashboard is a local web application built with React, TypeScript/TSX, Vite, Tailwind CSS, shadcn/ui patterns, Lucide React, TanStack Query, Zustand, Recharts, React Router, self-hosted Sora and Inter fonts, Framer Motion, GSAP, Lenis, and Three.js for a lazy-loaded Mission Control globe. SVG remains the default for interactive graphs and workflow canvases.
+The dashboard is a local web application built with React, TypeScript/TSX, Vite, Tailwind CSS, shadcn/ui patterns, Lucide React, TanStack Query, Zustand, Recharts, React Router, self-hosted Sora and Inter fonts, Framer Motion, GSAP, Lenis, and Three.js for a lazy-loaded Mission Control globe. React Flow powers the editable Agents and Automation canvases.
 
-The application must run without a backend, account, cloud service, database, node agent, or external service. A centralized, typed mock-data layer supplies demo clusters, nodes, telemetry, agents, tasks, and activity. Data-access boundaries should allow a future API implementation without making the dashboard depend on it now. Non-sensitive preferences may be saved in browser storage.
+The application runs without a backend, account, cloud service, node agent, or external service. Typed repositories use IndexedDB for structured local records and localStorage for non-sensitive preferences. Seed fixtures initialize an empty workspace only; data-access contracts are the boundary for future local/cloud APIs. Hardware telemetry and connectivity health stay clearly marked as sample data until services exist.
 
 ### Required dashboard areas
 
 - **Home:** greeting, selected-cluster summary, node status, resource utilization, recent activity, alerts, AI-agent summary, and meaningful quick actions.
 - **Mission Control:** selectable coordinator and worker nodes, animated connections, node details, cluster switching, pan/zoom, and fullscreen visualization. All values and statuses are simulated.
 - **Clusters:** create, rename, select, and edit demo cluster metadata; organize demo nodes and inspect cluster details.
-- **Nodes:** list and detail views with CPU, memory, GPU, disk, network, operating system, uptime, and mocked health history; coordinator designation is a local demo operation.
-- **Agents:** interactive mock relationship canvas with draggable agent nodes, pan/zoom, network and radial modes, and a selectable inspector.
+- **Nodes:** list and detail views with CPU, memory, GPU, disk, network, operating system, uptime, and sample health history; coordinator designation updates local records.
+- **Agents:** interactive local relationship canvas with draggable agent nodes, pan/zoom, network and radial modes, a selectable inspector, and persisted agent configuration.
 - **Automation:** interactive demo workflow canvas with draggable steps, branches, configuration preview, and simulated run status. No automation is executed.
 - **AI Software:** catalog Codex, Claude Code, Hermes Agent, OpenClaw, and future custom integrations. Provide target selection and configuration/install previews; every install action must be clearly labeled as a demonstration and must not install software.
 - **Tasks:** simulated task overview, queue, assignment controls, job states, timeline, history, filters, and sorting. No job is executed on a real node.
@@ -66,18 +66,18 @@ For the Phase 1 dashboard, completion requires:
 
 1. The application runs locally using commands documented against the checked-in package manifest.
 2. All required dashboard areas are reachable through working navigation, including Agents and Automation.
-3. Topology selection and controls, demo cluster management, catalog previews, and task controls work against mock data only.
+3. Topology selection and controls, local cluster management, catalog previews, and task records work against the persistent local provider. Hardware telemetry remains seeded sample data until a backend is available.
 4. Monitoring charts render typed historical demo data with clear time ranges and no false live-connectivity claims.
 5. Responsive behavior, keyboard access, visible focus, reduced-motion preferences, and performance mode are implemented.
 6. Type checking, linting, tests, and a production build pass using checked-in tooling.
-7. README and development documentation accurately explain setup and demo limitations.
+7. README and development documentation accurately explain setup, local record persistence, and backend integration limits.
 
 For future control-plane phases, acceptance criteria must additionally define threat model, authorization, enrollment/revocation, data handling, recovery, performance baselines, and operational support before production claims are made.
 
 ## Risks and assumptions
 
 - Mock data can be mistaken for real telemetry; persistent labels and clear demo-only language are required.
-- UI contracts may evolve when the eventual API is designed; the mock-data boundary should remain explicit and typed.
+- UI contracts may evolve when the eventual API is designed; the local-provider boundary should remain explicit and typed.
 - Browser storage is suitable only for non-sensitive demo preferences, not secrets or operational state.
 - External products and APIs may change; catalog entries are informational placeholders until an integration is implemented and reviewed.
 - No performance or reliability targets are asserted for the eventual infrastructure product until measurable workloads and hardware baselines exist.

@@ -1,18 +1,24 @@
+import { useQueryClient } from "@tanstack/react-query";
 import * as Icons from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import * as UI from "../components/ui";
 import { demoApi } from "../data/demoApi";
-import { initialTasks } from "../data/mock";
+import { dashboardProvider } from "../data/provider";
+import type { DemoTask } from "../data/models";
+import { useLocalCollection } from "../data/useDashboardData";
 import { useDashboardStore } from "../state/useDashboardStore";
 import { TaskBadge } from "./shared";
 
 export function TasksPage() {
-  const [tasks, setTasks] = useState(initialTasks);
+  const { data: savedTasks = [] } = useLocalCollection<DemoTask>("tasks");
+  const [tasks, setTasks] = useState<DemoTask[]>([]);
   const [filter, setFilter] = useState("all");
   const [sortBy, setSortBy] = useState("recent");
   const [toast, setToast] = useState("");
   const [assignment, setAssignment] = useState<Record<string, string>>({});
   const nodes = useDashboardStore((state) => state.nodes);
+  const queryClient = useQueryClient();
+  useEffect(() => setTasks(savedTasks), [savedTasks]);
   const filtered = tasks.filter(
     (task) => filter === "all" || task.status === filter,
   );
@@ -24,11 +30,17 @@ export function TasksPage() {
   });
   const runDemo = () => {
     const id = `job-${Date.now()}`;
-    setTasks((previous) => [
-      demoApi.createTask(nodes[0]?.id ?? "Unassigned", id),
-      ...previous,
-    ]);
-    setToast("Sample task added to the local demo queue.");
+    const task = demoApi.createTask(nodes[0]?.id ?? "Unassigned", id);
+    void dashboardProvider.tasks
+      .create(task.id, task)
+      .then(() => {
+        setTasks((previous) => [task, ...previous]);
+        void queryClient.invalidateQueries({
+          queryKey: ["local-records", "tasks"],
+        });
+        setToast("Task saved to the local queue. Execution is unavailable.");
+      })
+      .catch(() => setToast("Task could not be saved locally."));
     window.setTimeout(() => setToast(""), 2800);
   };
   return (
@@ -69,8 +81,10 @@ export function TasksPage() {
         />
         <UI.Stat
           label="Completed today"
-          value="12"
-          detail="Illustrative count"
+          value={String(
+            tasks.filter((task) => task.status === "completed").length,
+          ).padStart(2, "0")}
+          detail="Completed sample records"
           icon={<Icons.Check size={16} />}
           tone="green"
         />
@@ -193,11 +207,23 @@ export function TasksPage() {
                             ...prev,
                             [task.id]: assigned.nodeId,
                           }));
-                          setTasks((previous) =>
-                            previous.map((item) =>
-                              item.id === task.id ? assigned : item,
-                            ),
-                          );
+                          void dashboardProvider.tasks
+                            .update(task.id, assigned)
+                            .then(() => {
+                              setTasks((previous) =>
+                                previous.map((item) =>
+                                  item.id === task.id ? assigned : item,
+                                ),
+                              );
+                              void queryClient.invalidateQueries({
+                                queryKey: ["local-records", "tasks"],
+                              });
+                            })
+                            .catch(() =>
+                              setToast(
+                                "Assignment could not be saved locally.",
+                              ),
+                            );
                         })()
                       }
                     >

@@ -40,6 +40,12 @@ export type Software = {
   color: string;
   status: "available" | "planned";
 };
+export type SoftwareConfig = {
+  id: string;
+  softwareId: string;
+  nodeId: string;
+  profile: string;
+};
 export type DemoTask = {
   id: string;
   name: string;

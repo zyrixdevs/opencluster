@@ -1,15 +1,25 @@
+import { useQueryClient } from "@tanstack/react-query";
 import * as Icons from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ResourceChart } from "../components/Charts";
 import { HologramVisual } from "../components/HologramVisual";
 import * as UI from "../components/ui";
-import { initialActivity, softwareCatalog } from "../data/mock";
-import { useDemoData } from "../data/useDashboardData";
+import type { ActivityEvent, Software } from "../data/models";
+import { useDemoData, useLocalCollection } from "../data/useDashboardData";
+import { useDashboardStore } from "../state/useDashboardStore";
 import { ActivityLine } from "./shared";
 
 export function HomePage() {
   const { cluster, clusters, nodes } = useDemoData();
+  const { data: initialActivity = [] } =
+    useLocalCollection<ActivityEvent>("activity");
+  const { data: softwareCatalog = [] } =
+    useLocalCollection<Software>("software-catalog");
+  const { data: agentEntities = [] } =
+    useLocalCollection<import("../data/agents").AgentEntity>("agents");
+  const queryClient = useQueryClient();
+  const displayName = useDashboardStore((state) => state.displayName);
   const online = nodes.filter(
     (n) => n.health === "healthy" || n.health === "warning",
   ).length;
@@ -29,18 +39,25 @@ export function HomePage() {
     month: "long",
     day: "numeric",
   }).format(new Date());
+  const hour = new Date().getHours();
+  const salutation =
+    hour < 12
+      ? "Good morning,"
+      : hour < 18
+        ? "Good afternoon,"
+        : "Good evening,";
   return (
     <>
       {/* ORIGINAL (preserved, not deleted — disabled by comment): <UI.PageTitle eyebrow="WEDNESDAY, OCTOBER 22, 2026" title="Good evening, operator" description="Here's what's happening across your infrastructure." actions={<UI.Button variant="primary" onClick={() => notify("Demo action: cluster overview refreshed")}><Icons.Activity size={15} /> Refresh overview</UI.Button>} /> */}
       <section className="home-hero">
         <div className="home-hero-copy">
           <div className="eyebrow">
-            <span className="hero-eyebrow-mark" /> OPENCLUSTER / MISSION SYSTEM
+            <span className="hero-eyebrow-mark" /> OPENCLUSTER / LOCAL WORKSPACE
           </div>
           <h1>
-            Good evening,
+            {salutation}
             <br />
-            <em>operator.</em>
+            <em>{displayName}.</em>
           </h1>
           <p>
             Your cluster operations, agent workflows, and system signals in one
@@ -53,7 +70,11 @@ export function HomePage() {
             <button
               className="button button-secondary"
               type="button"
-              onClick={() => notify("Demo action: cluster overview refreshed")}
+              onClick={() => {
+                void queryClient
+                  .invalidateQueries()
+                  .then(() => notify("Local workspace snapshot refreshed."));
+              }}
             >
               <Icons.RefreshCw size={14} /> Refresh snapshot
             </button>
@@ -78,9 +99,10 @@ export function HomePage() {
           <Icons.Sparkles size={16} />
         </span>
         <div>
-          <b>You’re exploring OpenCluster in demo mode</b>
+          <b>Your local OpenCluster workspace is ready</b>
           <span>
-            Everything you see is simulated. No infrastructure is connected.
+            Cluster records persist here. Hardware metrics remain sample data
+            until a backend is connected.
           </span>
         </div>
         <button
@@ -93,30 +115,39 @@ export function HomePage() {
       </div>
       <div className="stats-grid">
         <UI.Stat
-          label="Total nodes"
-          value={String(nodes.length).padStart(2, "0")}
-          detail={`${online} online · ${warning} need attention`}
-          icon={<Icons.Server size={17} />}
+          label="Clusters"
+          value={String(clusters.length).padStart(2, "0")}
+          detail="Local cluster records"
+          icon={<Icons.Layers3 size={17} />}
           tone="green"
         />
         <UI.Stat
-          label="Cluster health"
-          value={warning ? "Attention" : "Nominal"}
-          detail={`${cluster?.name ?? "No cluster"} · sample status`}
-          icon={<Icons.Activity size={17} />}
+          label="Nodes online"
+          value={String(online).padStart(2, "0")}
+          detail={`of ${nodes.length} · sample status`}
+          icon={<Icons.Server size={17} />}
           tone="blue"
         />
         <UI.Stat
-          label="Active tasks"
-          value="03"
-          detail="1 running · 1 queued · 1 done"
-          icon={<Icons.Workflow size={17} />}
+          label="Alerts"
+          value={String(warning).padStart(2, "0")}
+          detail="Sample health signals"
+          icon={<Icons.Activity size={17} />}
           tone="purple"
         />
         <UI.Stat
+          label="Average CPU"
+          value={`${avgCpu}%`}
+          detail={`${cluster?.name ?? "Active cluster"} · sample`}
+          icon={<Icons.Cpu size={17} />}
+          tone="blue"
+        />
+        <UI.Stat
           label="AI agents"
-          value="02"
-          detail="2 catalog entries available"
+          value={String(
+            agentEntities.filter((agent) => agent.kind === "agent").length,
+          ).padStart(2, "0")}
+          detail="Persisted local agent records"
           icon={<Icons.Bot size={17} />}
           tone="amber"
         />
@@ -161,28 +192,32 @@ export function HomePage() {
               Open graph <Icons.ArrowRight size={13} />
             </Link>
           </div>
-          <div className="agent-summary-row">
-            <span className="agent-summary-icon">
-              <Icons.BrainCircuit size={15} />
-            </span>
-            <span>
-              <b>Codex Worker</b>
-              <small>Workflow ready · demo state</small>
-            </span>
-            <i className="agent-state-dot" />
-          </div>
-          <div className="agent-summary-row">
-            <span className="agent-summary-icon purple">
-              <Icons.Bot size={15} />
-            </span>
-            <span>
-              <b>Hermes Agent</b>
-              <small>Monitoring · demo state</small>
-            </span>
-            <i className="agent-state-dot" />
-          </div>
+          {agentEntities
+            .filter((agent) => agent.kind === "agent")
+            .slice(0, 3)
+            .map((agent) => (
+              <div className="agent-summary-row" key={agent.id}>
+                <span
+                  className={`agent-summary-icon ${agent.color === "violet" ? "purple" : ""}`}
+                >
+                  {agent.icon === "codex" ? (
+                    <Icons.BrainCircuit size={15} />
+                  ) : (
+                    <Icons.Bot size={15} />
+                  )}
+                </span>
+                <span>
+                  <b>{agent.name}</b>
+                  <small>{agent.role} · local record</small>
+                </span>
+                <i
+                  className={`agent-state-dot ${agent.status === "attention" || agent.status === "paused" ? "attention" : ""}`}
+                />
+              </div>
+            ))}
           <div className="agent-summary-foot">
-            <Icons.CircleAlert size={13} /> All agent activity is illustrative.
+            <Icons.CircleAlert size={13} /> Agent records are local
+            configuration; no agent is connected.
           </div>
         </UI.Card>
         <UI.Card className="home-pulse-card home-software-summary">
@@ -265,11 +300,10 @@ export function HomePage() {
             <div>
               <span>NETWORK I/O</span>
               <b>
-                2.4 <i>Gb/s</i>
+                {nodes.reduce((sum, node) => sum + node.network, 0)}{" "}
+                <i>Mb/s sample</i>
               </b>
-              <small>
-                <Icons.ArrowUpRight size={12} /> peak 3.1 Gb/s
-              </small>
+              <small>Local sample nodes · no live network telemetry</small>
             </div>
           </div>
           <div className="home-chart">
