@@ -3,8 +3,8 @@ import * as Icons from "lucide-react";
 import type { CSSProperties } from "react";
 import { useEffect, useState } from "react";
 import * as UI from "../components/ui";
-import { dashboardProvider } from "../data/provider";
 import type { Software, SoftwareConfig } from "../data/models";
+import { dashboardProvider } from "../data/provider";
 import { useDemoData, useLocalCollection } from "../data/useDashboardData";
 import { handleDialogKeyDown } from "./shared";
 

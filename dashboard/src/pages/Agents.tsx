@@ -207,7 +207,7 @@ function AgentsContent() {
         role: selected.role,
         model: selected.model,
       });
-  }, [selected?.id, selected?.name, selected?.role, selected?.model]);
+  }, [selected]);
 
   useEffect(() => {
     if (isPending) return;

@@ -129,7 +129,9 @@ describe("local IndexedDB provider", () => {
 
   it("preserves saved records when a replacement contains invalid data", async () => {
     const before = await localProvider.list("clusters");
-    await expect(localProvider.replace("clusters", [{ id: "bad", value: {} }])).rejects.toThrow();
+    await expect(
+      localProvider.replace("clusters", [{ id: "bad", value: {} }]),
+    ).rejects.toThrow();
     expect(await localProvider.list("clusters")).toEqual(before);
   });
 

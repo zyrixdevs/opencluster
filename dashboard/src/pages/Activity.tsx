@@ -1,6 +1,6 @@
+import { useQueryClient } from "@tanstack/react-query";
 import * as Icons from "lucide-react";
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import * as UI from "../components/ui";
 import type { ActivityEvent } from "../data/models";
 import { useLocalCollection } from "../data/useDashboardData";

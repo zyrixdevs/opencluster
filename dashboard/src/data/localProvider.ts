@@ -246,7 +246,9 @@ export const localProvider = {
     bucket: Bucket,
     records: Array<{ id: string; value: T }>,
   ): Promise<void> {
-    const validated = records.map((record) => recordFor(bucket, record.id, record.value));
+    const validated = records.map((record) =>
+      recordFor(bucket, record.id, record.value),
+    );
     const database = await db();
     const tx = database.transaction("records", "readwrite");
     for (const record of validated) {
@@ -267,14 +269,14 @@ export const localProvider = {
   ): Promise<void> {
     // Validate every bucket before starting a transaction that clears saved records.
     for (const [bucket, records] of Object.entries(buckets)) {
-      for (const record of records ?? []) recordFor(bucket as Bucket, record.id, record.value);
+      for (const record of records ?? [])
+        recordFor(bucket as Bucket, record.id, record.value);
     }
     const database = await db();
     const tx = database.transaction("records", "readwrite");
-    for (const [bucket, records] of Object.entries(buckets) as Array<[
-      Bucket,
-      Array<{ id: string; value: unknown }> | undefined,
-    ]>) {
+    for (const [bucket, records] of Object.entries(buckets) as Array<
+      [Bucket, Array<{ id: string; value: unknown }> | undefined]
+    >) {
       if (!records) continue;
       const existing = await tx.store.index("bucket").getAllKeys(bucket);
       await Promise.all(existing.map((key) => tx.store.delete(key)));
@@ -299,10 +301,7 @@ export const localProvider = {
     legacy?: unknown,
   ): Promise<{ clusters: Cluster[]; nodes: Node[] }> {
     const database = await db();
-    const marker = await database.get(
-      "records",
-      keyFor("meta", "initialized"),
-    );
+    const marker = await database.get("records", keyFor("meta", "initialized"));
     const firstRun =
       !marker || !recordValueSchemas.meta.safeParse(marker.value).success;
     const existingClusters = (
@@ -357,17 +356,26 @@ export const localProvider = {
         "nodes",
         safeNodes.map((value) => ({ id: value.id, value })),
       );
-    if (firstRun && !(await database.countFromIndex("records", "bucket", "telemetry")))
+    if (
+      firstRun &&
+      !(await database.countFromIndex("records", "bucket", "telemetry"))
+    )
       await this.putMany(
         "telemetry",
         telemetry.map((value, index) => ({ id: String(index), value })),
       );
-    if (firstRun && !(await database.countFromIndex("records", "bucket", "tasks")))
+    if (
+      firstRun &&
+      !(await database.countFromIndex("records", "bucket", "tasks"))
+    )
       await this.putMany(
         "tasks",
         initialTasks.map((value: DemoTask) => ({ id: value.id, value })),
       );
-    if (firstRun && !(await database.countFromIndex("records", "bucket", "activity")))
+    if (
+      firstRun &&
+      !(await database.countFromIndex("records", "bucket", "activity"))
+    )
       await this.putMany(
         "activity",
         initialActivity.map((value: ActivityEvent) => ({
@@ -376,19 +384,24 @@ export const localProvider = {
         })),
       );
     if (
-      firstRun && !(await database.countFromIndex("records", "bucket", "software-catalog"))
+      firstRun &&
+      !(await database.countFromIndex("records", "bucket", "software-catalog"))
     )
       await this.putMany(
         "software-catalog",
         softwareCatalog.map((value) => ({ id: value.id, value })),
       );
-    if (firstRun && !(await database.countFromIndex("records", "bucket", "agents")))
+    if (
+      firstRun &&
+      !(await database.countFromIndex("records", "bucket", "agents"))
+    )
       await this.putMany(
         "agents",
         agentSeedCatalog.map((value: AgentEntity) => ({ id: value.id, value })),
       );
     if (
-      firstRun && !(await database.countFromIndex("records", "bucket", "agent-relations"))
+      firstRun &&
+      !(await database.countFromIndex("records", "bucket", "agent-relations"))
     )
       await this.putMany(
         "agent-relations",
@@ -404,10 +417,16 @@ export const localProvider = {
     await this.replaceBuckets({
       clusters: initialClusters.map((value) => ({ id: value.id, value })),
       nodes: initialNodes.map((value) => ({ id: value.id, value })),
-      telemetry: telemetry.map((value, index) => ({ id: String(index), value })),
+      telemetry: telemetry.map((value, index) => ({
+        id: String(index),
+        value,
+      })),
       tasks: initialTasks.map((value) => ({ id: value.id, value })),
       activity: initialActivity.map((value) => ({ id: value.id, value })),
-      "software-catalog": softwareCatalog.map((value) => ({ id: value.id, value })),
+      "software-catalog": softwareCatalog.map((value) => ({
+        id: value.id,
+        value,
+      })),
       workflows: [],
       "agent-layouts": [],
       agents: agentSeedCatalog.map((value) => ({ id: value.id, value })),

@@ -48,7 +48,9 @@ describe("useDashboardStore", () => {
       store.addCluster("First concurrent", "Local", ""),
       store.addCluster("Second concurrent", "Local", ""),
     ]);
-    expect(useDashboardStore.getState().clusters.map((item) => item.name)).toEqual(
+    expect(
+      useDashboardStore.getState().clusters.map((item) => item.name),
+    ).toEqual(
       expect.arrayContaining(["First concurrent", "Second concurrent"]),
     );
   });
@@ -111,10 +113,16 @@ describe("useDashboardStore", () => {
   });
 
   it("removes a cluster atomically and preserves the fallback coordinator", async () => {
-    await expect(useDashboardStore.getState().removeCluster("cl-main")).resolves.toBe(true);
+    await expect(
+      useDashboardStore.getState().removeCluster("cl-main"),
+    ).resolves.toBe(true);
     const { clusters, nodes } = useDashboardStore.getState();
     expect(clusters.some((cluster) => cluster.id === "cl-main")).toBe(false);
-    expect(nodes.filter((node) => node.clusterId === "cl-edge" && node.role === "coordinator")).toHaveLength(1);
+    expect(
+      nodes.filter(
+        (node) => node.clusterId === "cl-edge" && node.role === "coordinator",
+      ),
+    ).toHaveLength(1);
     expect(nodes.find((node) => node.id === "node-01")).toMatchObject({
       clusterId: "cl-edge",
       role: "worker",

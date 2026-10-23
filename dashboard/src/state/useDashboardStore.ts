@@ -3,9 +3,9 @@ import type { StateStorage } from "zustand/middleware";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { demoApi } from "../data/demoApi";
 import { localProvider } from "../data/localProvider";
-import { dashboardQueryClient } from "../data/queryClient";
 import { initialClusters, initialNodes } from "../data/mock";
 import type { Cluster, Node } from "../data/models";
+import { dashboardQueryClient } from "../data/queryClient";
 
 let localMutationQueue: Promise<void> = Promise.resolve();
 function serializeLocalMutation<T>(mutation: () => Promise<T>): Promise<T> {
@@ -144,108 +144,113 @@ export const useDashboardStore = create<DashboardState>()(
       theme: "dark",
       addCluster: (name, region, description) =>
         serializeLocalMutation(async () => {
-        const state = useDashboardStore.getState();
-        const created = demoApi.createCluster(name, region, description);
-        const cluster = state.clusters.some((item) => item.id === created.id)
-          ? { ...created, id: `${created.id}-${crypto.randomUUID()}` }
-          : created;
-        try {
-          await localProvider.put("clusters", cluster.id, cluster);
-          set({
-            clusters: [...state.clusters, cluster],
-            selectedClusterId: cluster.id,
-            persistenceError: null,
-          });
-          void dashboardQueryClient.invalidateQueries();
-        } catch (error) {
-          set({
-            persistenceError:
-              error instanceof Error
-                ? error.message
-                : "Could not save cluster locally.",
-          });
-          throw error;
-        }
+          const state = useDashboardStore.getState();
+          const created = demoApi.createCluster(name, region, description);
+          const cluster = state.clusters.some((item) => item.id === created.id)
+            ? { ...created, id: `${created.id}-${crypto.randomUUID()}` }
+            : created;
+          try {
+            await localProvider.put("clusters", cluster.id, cluster);
+            set({
+              clusters: [...state.clusters, cluster],
+              selectedClusterId: cluster.id,
+              persistenceError: null,
+            });
+            void dashboardQueryClient.invalidateQueries();
+          } catch (error) {
+            set({
+              persistenceError:
+                error instanceof Error
+                  ? error.message
+                  : "Could not save cluster locally.",
+            });
+            throw error;
+          }
         }),
       updateCluster: (id, changes) =>
         serializeLocalMutation(async () => {
-        const state = useDashboardStore.getState();
-        const clusters = state.clusters.map((cluster) =>
-          cluster.id === id ? demoApi.updateCluster(cluster, changes) : cluster,
-        );
-        const updated = clusters.find((cluster) => cluster.id === id);
-        if (!updated) return;
-        try {
-          await localProvider.put("clusters", id, updated);
-          set({ clusters, persistenceError: null });
-          void dashboardQueryClient.invalidateQueries();
-        } catch (error) {
-          set({
-            persistenceError:
-              error instanceof Error
-                ? error.message
-                : "Could not save cluster locally.",
-          });
-          throw error;
-        }
+          const state = useDashboardStore.getState();
+          const clusters = state.clusters.map((cluster) =>
+            cluster.id === id
+              ? demoApi.updateCluster(cluster, changes)
+              : cluster,
+          );
+          const updated = clusters.find((cluster) => cluster.id === id);
+          if (!updated) return;
+          try {
+            await localProvider.put("clusters", id, updated);
+            set({ clusters, persistenceError: null });
+            void dashboardQueryClient.invalidateQueries();
+          } catch (error) {
+            set({
+              persistenceError:
+                error instanceof Error
+                  ? error.message
+                  : "Could not save cluster locally.",
+            });
+            throw error;
+          }
         }),
       removeCluster: (id) =>
         serializeLocalMutation(async () => {
-        const state = useDashboardStore.getState();
-        if (state.clusters.length < 2) return false;
-        const fallback = state.clusters.find((cluster) => cluster.id !== id);
-        if (!fallback || !state.clusters.some((cluster) => cluster.id === id))
-          return false;
-        const movedNodes = state.nodes.map((node) =>
-          node.clusterId === id ? { ...node, clusterId: fallback.id } : node,
-        );
-        const targetNodes = movedNodes.filter(
-          (node) => node.clusterId === fallback.id,
-        );
-        const targetCoordinator =
-          state.nodes.find(
-            (node) => node.clusterId === fallback.id && node.role === "coordinator",
-          ) ??
-          targetNodes[0];
-        const nodes = movedNodes.map((node) =>
-          node.clusterId === fallback.id
-            ? {
-                ...node,
-                role: node.id === targetCoordinator?.id ? "coordinator" as const : "worker" as const,
-              }
-            : node,
-        );
-        const clusters = state.clusters
-          .filter((cluster) => cluster.id !== id)
-          .map((cluster) => ({
-            ...cluster,
-            nodeIds: nodes
-              .filter((node) => node.clusterId === cluster.id)
-              .map((node) => node.id),
-          }));
-        try {
-          await localProvider.writeClusterNodeState(clusters, nodes);
-          set({
-            clusters,
-            nodes,
-            selectedClusterId:
-              state.selectedClusterId === id
-                ? fallback.id
-                : state.selectedClusterId,
-            selectedNodeId: null,
-            persistenceError: null,
-          });
-          void dashboardQueryClient.invalidateQueries();
-          return true;
-        } catch (error) {
-          set({
-            persistenceError:
-              error instanceof Error
-                ? error.message
-                : "Could not remove cluster locally.",
-          });
-          return false;
-        }
+          const state = useDashboardStore.getState();
+          if (state.clusters.length < 2) return false;
+          const fallback = state.clusters.find((cluster) => cluster.id !== id);
+          if (!fallback || !state.clusters.some((cluster) => cluster.id === id))
+            return false;
+          const movedNodes = state.nodes.map((node) =>
+            node.clusterId === id ? { ...node, clusterId: fallback.id } : node,
+          );
+          const targetNodes = movedNodes.filter(
+            (node) => node.clusterId === fallback.id,
+          );
+          const targetCoordinator =
+            state.nodes.find(
+              (node) =>
+                node.clusterId === fallback.id && node.role === "coordinator",
+            ) ?? targetNodes[0];
+          const nodes = movedNodes.map((node) =>
+            node.clusterId === fallback.id
+              ? {
+                  ...node,
+                  role:
+                    node.id === targetCoordinator?.id
+                      ? ("coordinator" as const)
+                      : ("worker" as const),
+                }
+              : node,
+          );
+          const clusters = state.clusters
+            .filter((cluster) => cluster.id !== id)
+            .map((cluster) => ({
+              ...cluster,
+              nodeIds: nodes
+                .filter((node) => node.clusterId === cluster.id)
+                .map((node) => node.id),
+            }));
+          try {
+            await localProvider.writeClusterNodeState(clusters, nodes);
+            set({
+              clusters,
+              nodes,
+              selectedClusterId:
+                state.selectedClusterId === id
+                  ? fallback.id
+                  : state.selectedClusterId,
+              selectedNodeId: null,
+              persistenceError: null,
+            });
+            void dashboardQueryClient.invalidateQueries();
+            return true;
+          } catch (error) {
+            set({
+              persistenceError:
+                error instanceof Error
+                  ? error.message
+                  : "Could not remove cluster locally.",
+            });
+            return false;
+          }
         }),
       selectCluster: (id) =>
         set({ selectedClusterId: id, selectedNodeId: null }),
@@ -271,129 +276,135 @@ export const useDashboardStore = create<DashboardState>()(
         }),
       setDemoDataset: (demoDataset) =>
         serializeLocalMutation(async () => {
-        const clusters =
-          demoDataset === "homelab-only"
-            ? [initialClusters[0]]
-            : initialClusters;
-        const nodes = initialNodes.filter((node) =>
-          clusters.some((cluster) => cluster.id === node.clusterId),
-        );
-        const nextClusters = structuredClone(clusters).map((cluster) => ({
-          ...cluster,
-          nodeIds: nodes
-            .filter((node) => node.clusterId === cluster.id)
-            .map((node) => node.id),
-        }));
-        try {
-          await localProvider.writeClusterNodeState(nextClusters, nodes);
-          set({
-            demoDataset,
-            clusters: nextClusters,
-            nodes,
-            selectedClusterId: clusters[0].id,
-            selectedNodeId: null,
-            persistenceError: null,
-          });
-          void dashboardQueryClient.invalidateQueries();
-        } catch (error) {
-          set({
-            persistenceError:
-              error instanceof Error
-                ? error.message
-                : "Could not change the local dataset.",
-          });
-          throw error;
-        }
+          const clusters =
+            demoDataset === "homelab-only"
+              ? [initialClusters[0]]
+              : initialClusters;
+          const nodes = initialNodes.filter((node) =>
+            clusters.some((cluster) => cluster.id === node.clusterId),
+          );
+          const nextClusters = structuredClone(clusters).map((cluster) => ({
+            ...cluster,
+            nodeIds: nodes
+              .filter((node) => node.clusterId === cluster.id)
+              .map((node) => node.id),
+          }));
+          try {
+            await localProvider.writeClusterNodeState(nextClusters, nodes);
+            set({
+              demoDataset,
+              clusters: nextClusters,
+              nodes,
+              selectedClusterId: clusters[0].id,
+              selectedNodeId: null,
+              persistenceError: null,
+            });
+            void dashboardQueryClient.invalidateQueries();
+          } catch (error) {
+            set({
+              persistenceError:
+                error instanceof Error
+                  ? error.message
+                  : "Could not change the local dataset.",
+            });
+            throw error;
+          }
         }),
       resetDemoData: () =>
         serializeLocalMutation(async () => {
-        await localProvider.resetRecords();
-        set({
-          clusters: initialClusters,
-          nodes: initialNodes,
-          selectedClusterId: initialClusters[0].id,
-          selectedNodeId: null,
-          displayName: "operator",
-          sidebarCollapsed: false,
-          compactDashboard: false,
-          demoMotion: true,
-          cinematicMotion: false,
-          motionMode: "system",
-          performanceMode: false,
-          visualQuality: "auto",
-          theme: "dark",
-          demoDataset: "multi-cluster",
-        });
-        void dashboardQueryClient.invalidateQueries();
+          await localProvider.resetRecords();
+          set({
+            clusters: initialClusters,
+            nodes: initialNodes,
+            selectedClusterId: initialClusters[0].id,
+            selectedNodeId: null,
+            displayName: "operator",
+            sidebarCollapsed: false,
+            compactDashboard: false,
+            demoMotion: true,
+            cinematicMotion: false,
+            motionMode: "system",
+            performanceMode: false,
+            visualQuality: "auto",
+            theme: "dark",
+            demoDataset: "multi-cluster",
+          });
+          void dashboardQueryClient.invalidateQueries();
         }),
       clearPersistenceError: () => set({ persistenceError: null }),
       setTheme: (theme) => set({ theme }),
       toggleCoordinator: (id) =>
         serializeLocalMutation(async () => {
-        const state = useDashboardStore.getState();
-        const nodes = demoApi.designateCoordinator(state.nodes, id);
-        try {
-          await localProvider.putMany(
-            "nodes",
-            nodes.map((value) => ({ id: value.id, value })),
-          );
-          set({ nodes, persistenceError: null });
-          void dashboardQueryClient.invalidateQueries({ queryKey: ["nodes"] });
-        } catch (error) {
-          set({
-            persistenceError:
-              error instanceof Error
-                ? error.message
-                : "Could not save coordinator selection.",
-          });
-        }
+          const state = useDashboardStore.getState();
+          const nodes = demoApi.designateCoordinator(state.nodes, id);
+          try {
+            await localProvider.putMany(
+              "nodes",
+              nodes.map((value) => ({ id: value.id, value })),
+            );
+            set({ nodes, persistenceError: null });
+            void dashboardQueryClient.invalidateQueries({
+              queryKey: ["nodes"],
+            });
+          } catch (error) {
+            set({
+              persistenceError:
+                error instanceof Error
+                  ? error.message
+                  : "Could not save coordinator selection.",
+            });
+          }
         }),
       moveNode: (nodeId, clusterId) =>
         serializeLocalMutation(async () => {
-        const state = useDashboardStore.getState();
-        if (!state.clusters.some((cluster) => cluster.id === clusterId)) return;
-        const moving = state.nodes.find((node) => node.id === nodeId);
-        if (!moving || moving.clusterId === clusterId) return;
-        const sourceClusterId = moving.clusterId;
-        const targetHasCoordinator = state.nodes.some(
-          (node) => node.clusterId === clusterId && node.role === "coordinator",
-        );
-        const sourceReplacement = state.nodes.find(
-          (node) => node.clusterId === sourceClusterId && node.id !== nodeId,
-        );
-        const nodes = state.nodes.map((node) => {
-          if (node.id === nodeId) {
-            const moved = demoApi.moveNode(node, clusterId);
-            return {
-              ...moved,
-              role: targetHasCoordinator ? ("worker" as const) : ("coordinator" as const),
-            };
-          }
-          if (
-            moving.role === "coordinator" &&
-            node.id === sourceReplacement?.id
-          )
-            return { ...node, role: "coordinator" as const };
-          return node;
-        });
-        const clusters = state.clusters.map((cluster) => ({
-          ...cluster,
-          nodeIds: nodes
-            .filter((node) => node.clusterId === cluster.id)
-            .map((node) => node.id),
-        }));
-        try {
-          await localProvider.writeClusterNodeState(clusters, nodes);
-          set({ nodes, clusters, persistenceError: null });
-          void dashboardQueryClient.invalidateQueries();
-        } catch (error) {
-          set({
-            persistenceError:
-              error instanceof Error
-                ? error.message
-                : "Could not move node locally.",
+          const state = useDashboardStore.getState();
+          if (!state.clusters.some((cluster) => cluster.id === clusterId))
+            return;
+          const moving = state.nodes.find((node) => node.id === nodeId);
+          if (!moving || moving.clusterId === clusterId) return;
+          const sourceClusterId = moving.clusterId;
+          const targetHasCoordinator = state.nodes.some(
+            (node) =>
+              node.clusterId === clusterId && node.role === "coordinator",
+          );
+          const sourceReplacement = state.nodes.find(
+            (node) => node.clusterId === sourceClusterId && node.id !== nodeId,
+          );
+          const nodes = state.nodes.map((node) => {
+            if (node.id === nodeId) {
+              const moved = demoApi.moveNode(node, clusterId);
+              return {
+                ...moved,
+                role: targetHasCoordinator
+                  ? ("worker" as const)
+                  : ("coordinator" as const),
+              };
+            }
+            if (
+              moving.role === "coordinator" &&
+              node.id === sourceReplacement?.id
+            )
+              return { ...node, role: "coordinator" as const };
+            return node;
           });
-        }
+          const clusters = state.clusters.map((cluster) => ({
+            ...cluster,
+            nodeIds: nodes
+              .filter((node) => node.clusterId === cluster.id)
+              .map((node) => node.id),
+          }));
+          try {
+            await localProvider.writeClusterNodeState(clusters, nodes);
+            set({ nodes, clusters, persistenceError: null });
+            void dashboardQueryClient.invalidateQueries();
+          } catch (error) {
+            set({
+              persistenceError:
+                error instanceof Error
+                  ? error.message
+                  : "Could not move node locally.",
+            });
+          }
         }),
     }),
     {

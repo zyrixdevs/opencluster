@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useDashboardStore } from "../state/useDashboardStore";
-import { dashboardProvider } from "./provider";
 import type { Bucket } from "./localProvider";
+import { dashboardProvider } from "./provider";
 
 type CollectionBucket = Exclude<Bucket, "agent-layouts">;
 
