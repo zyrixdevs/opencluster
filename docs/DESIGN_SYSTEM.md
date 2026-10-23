@@ -1,14 +1,16 @@
 # Design System Direction
 
-**Status:** Visual and interaction guidance only; no interface is implemented.
+**Status:** Implemented dashboard direction for Phase 1; this remains a demo interface and does not indicate an operational control plane.
 
 ## Direction
 
 OpenCluster should read as a professional infrastructure command center: dark-first, restrained, information-dense, and calm under operational pressure. Favor clear hierarchy and consistent alignment over decorative effects. Support beginner homelab users with plain labels and useful empty states while retaining fast scanning and filters for experienced administrators.
 
+The dashboard uses a dark graphite foundation, blue/cyan holographic accents, and subtle glass-like surfaces. Sora is used for display headings and Inter for dense UI text and labels. Font files are bundled locally; page rendering does not depend on a font CDN.
+
 ## Layout and navigation
 
-Use a persistent primary navigation for Overview, Nodes, Workloads/Agents (when implemented), Alerts, and Administration. Keep global cluster context and connection state visible. Desktop layouts prioritize multi-column comparison and resizable information density; tablet collapses secondary navigation; mobile prioritizes status, search, and focused detail views. Multi-monitor use should preserve context across wide displays without relying on extreme-width layouts.
+Use a persistent primary navigation for Home, Mission Control, Clusters, Nodes, Agents, Automation, AI Software, Tasks, Monitoring, Activity, and Settings. Keep global cluster context and demo status visible. Desktop layouts prioritize multi-column comparison and information density; tablet collapses secondary navigation; mobile prioritizes status, search, and focused detail views.
 
 ## Component categories
 

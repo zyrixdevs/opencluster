@@ -1,9 +1,10 @@
 # Testing Strategy
 
-**Status:** Strategy for future implementation. The repository currently has no application code, so application test suites are not claimed.
+**Status:** Phase 1 dashboard checks are implemented; backend, agent, and deployment test layers remain future strategy.
 
 ## Test layers
 
+- **Dashboard checks:** strict TypeScript typecheck, Biome lint, Vitest tests for IndexedDB validation/migration, graph and workflow behavior, and a Vite production build.
 - **Documentation/repository checks:** verify required documents, Markdown structure/links where tooling exists, and safe workflow configuration.
 - **Unit tests:** metric parsing, validation, authorization decisions, state transitions, and serialization.
 - **Contract tests:** frontend/API schemas and control-server/agent protocol compatibility.
@@ -14,7 +15,7 @@
 
 ## Quality gates
 
-Require formatting, linting, type checks, tests relevant to changed areas, migration validation, and security-sensitive review before merge. CI should run only tools and artifacts present in the repository. Do not add a frontend/backend build job until those applications and their package configuration exist. Publish reproducible commands in `DEVELOPMENT.md` when tooling is selected.
+Require formatting, linting, type checks, tests relevant to changed areas, migration validation when applicable, and security-sensitive review before merge. CI runs the dashboard's checked-in scripts and documentation checks. Backend migrations and integration jobs wait until backend services exist. Reproducible commands are in `DEVELOPMENT.md`.
 
 ## Test data and environments
 

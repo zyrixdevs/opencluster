@@ -1,110 +1,83 @@
 # OpenCluster Product Requirements
 
-**Status:** Phase 0 proposal. OpenCluster has no implemented application features yet.
+**Status:** Phase 1 dashboard scope. The dashboard is specified here; implementation is in progress and no dashboard capability should be treated as available until it is present in the repository and verified.
 
-## Vision and problem
+## Product vision
 
-OpenCluster aims to give self-hosters and small infrastructure teams one place to understand and operate heterogeneous compute clusters. Today, node health, workload state, logs, automation, and AI agents are commonly split across separate tools. OpenCluster proposes a self-hosted control plane with explicit security boundaries and replaceable integrations.
+OpenCluster aims to give self-hosters and small infrastructure teams one place to understand and eventually operate heterogeneous compute clusters. The long-term product is a self-hosted control plane. Phase 1 delivers the permanent standalone browser dashboard, currently backed by a validated persistent local provider. Seeded hardware telemetry remains sample data; the UI is not a disposable prototype.
 
 ## Users and use cases
 
-- **Homelab operator:** see which machines are reachable, compare resource use, and understand alerts without logging into each machine.
-- **Small platform team:** group nodes by environment or role, review workload state, and audit privileged operations.
-- **AI/automation operator:** observe compatible agents and jobs, then control approved workflows.
-- **Contributor/integrator:** add an adapter or node capability without coupling it to the dashboard.
+- **Homelab operator:** explore cluster and node health, resource use, alerts, and recent activity in one interface.
+- **Small platform team:** organize nodes and inspect task and agent views as a demonstrable interaction model.
+- **Contributor/integrator:** develop dashboard components against typed local data contracts before a backend is selected.
 
-## Supported environments (planned)
+These use cases describe the dashboard experience. They do not imply connectivity to real infrastructure.
 
-The first node-agent target is Linux on Arch Linux and Debian, with architecture intended to remain distribution- and hardware-neutral. The control plane is planned for Linux-hosted containers. Other Linux distributions, Windows, macOS, Kubernetes, and managed cloud environments are future evaluation targets, not current support claims. Hardware metrics depend on operating-system interfaces and optional vendor drivers; GPU support must be capability-detected.
+## Phase 1 scope: standalone dashboard
 
-The proposed MVP cluster type is an operator-owned homelab or small self-managed on-prem environment: one OpenCluster control-plane deployment managing one cluster of Linux nodes. Nodes may use different hardware; capabilities must be reported rather than assumed. Exact node-count limits and control-plane high availability are not set. Multi-cluster federation, managed cloud fleets, HPC scheduling, and Kubernetes clusters as a managed target are outside the initial supported scope.
+The dashboard is a local web application built with React, TypeScript/TSX, Vite, Tailwind CSS, shadcn/ui patterns, Lucide React, TanStack Query, Zustand, Recharts, React Router, self-hosted Sora and Inter fonts, Framer Motion, GSAP, Lenis, and Three.js for a lazy-loaded Mission Control globe. React Flow powers the editable Agents and Automation canvases.
 
-## Product principles
+The application runs without a backend, account, cloud service, node agent, or external service. Typed repositories use IndexedDB for structured local records and localStorage for non-sensitive preferences. Seed fixtures initialize an empty workspace only; data-access contracts are the boundary for future local/cloud APIs. Hardware telemetry and connectivity health stay clearly marked as sample data until services exist.
 
-1. Self-hosted and operator-controlled; telemetry stays within the operator's deployment unless they configure an integration.
-2. Least privilege and explicit consent for every administrative action.
-3. Read-only visibility before remote mutation.
-4. Heterogeneous nodes and integrations through documented interfaces.
-5. Clear health, freshness, provenance, and failure states; never imply stale data is live.
-6. Useful defaults, documented trade-offs, and deployable components that can be operated independently.
+### Required dashboard areas
 
-## Planned functional requirements
+- **Home:** greeting, selected-cluster summary, node status, resource utilization, recent activity, alerts, AI-agent summary, and meaningful quick actions.
+- **Mission Control:** selectable coordinator and worker nodes, animated connections, node details, cluster switching, pan/zoom, and fullscreen visualization. All values and statuses are simulated.
+- **Clusters:** create, rename, select, and edit demo cluster metadata; organize demo nodes and inspect cluster details.
+- **Nodes:** list and detail views with CPU, memory, GPU, disk, network, operating system, uptime, and sample health history; coordinator designation updates local records.
+- **Agents:** interactive local relationship canvas with draggable agent nodes, pan/zoom, network and radial modes, a selectable inspector, and persisted agent configuration.
+- **Automation:** interactive demo workflow canvas with draggable steps, branches, configuration preview, and simulated run status. No automation is executed.
+- **AI Software:** catalog Codex, Claude Code, Hermes Agent, OpenClaw, and future custom integrations. Provide target selection and configuration/install previews; every install action must be clearly labeled as a demonstration and must not install software.
+- **Tasks:** simulated task overview, queue, assignment controls, job states, timeline, history, filters, and sorting. No job is executed on a real node.
+- **Monitoring:** historical demo CPU, memory, network, storage, and node health views with selectable time ranges. Do not imply live telemetry.
+- **Activity:** searchable and filterable demo event timeline and log table with severity categories and notifications.
+- **Settings:** appearance, theme, motion, dashboard customization, accessibility, mock-data/demo options, and clearly identified future integration placeholders.
 
-All requirements below describe intended behavior and are **not implemented**.
+### Interaction and presentation requirements
 
-### Cluster overview
+- Navigation between required areas works, with responsive desktop, tablet, and mobile layouts.
+- Visible controls either perform a meaningful local demo action or clearly state that the capability is unavailable.
+- Provide keyboard access, visible focus, semantic controls, readable contrast, reduced-motion support, and status cues that do not rely on color alone.
+- Use a dark-first, professional infrastructure command-center visual language with restrained motion and legible information density.
+- Include reusable navigation, search/command palette, dialogs, tables, charts, node and cluster cards, status indicators, notifications, and loading, empty, and error states where appropriate.
 
-- Summarize registered nodes and distinguish online, offline, unknown, and stale telemetry.
-- Show CPU, memory, storage, network, and capability-detected GPU metrics with timestamps and units.
-- Provide health indicators, alerts, recent activity, and historical metrics when retention is configured.
+## Explicit exclusions and demo boundaries
 
-### Node management
+Phase 1 does **not** include a backend, authentication service, database, node agent, real cluster connection, remote command execution, live AI software installation, real task execution, cloud dependency, or production telemetry. Demo state and browser preferences are not authoritative operational records. No security, availability, real-time, or infrastructure-management guarantee should be inferred from the interface.
 
-- Enroll, inspect, label, group, disable, and revoke nodes.
-- Display node identity, operating-system information, capabilities, connectivity, and resource use.
-- Keep monitoring permissions distinct from permissions to invoke node actions.
-- Expose a controlled service-operation interface only after authorization and audit requirements are designed and implemented.
+## Later product direction
 
-### Agent management and orchestration
+The eventual platform may add a self-hosted control plane, secure node enrollment, authenticated and authorized telemetry, audit records, integrations, and carefully scoped operations. Those capabilities require separate design decisions and implementation phases; this Phase 1 dashboard does not establish their security or architecture as complete.
 
-- Represent Codex, Hermes Agent, and custom integrations through adapters where those products expose supported interfaces.
-- Show agent health, execution history, and configured workflows.
-- Queue and schedule distributed jobs with explicit state, dependencies, retries, cancellation, and recovery semantics.
-- No arbitrary shell execution or agent autonomy is implied by this requirement.
+Potential future capabilities include:
 
-### Monitoring and developer operations
+- Linux node inventory and telemetry collection, initially evaluating Arch Linux and Debian without assuming specific hardware.
+- User authentication, role-based authorization, secure enrollment and revocation, and audit logging.
+- Historical monitoring, health checks, alerting, log search, and operator-managed retention.
+- Scoped GitHub and AI-agent adapters, followed by explicitly authorized workload orchestration.
+- Docker Compose local deployment; Kubernetes and cloud integrations only after separate evaluation.
 
-- Receive live telemetry and health checks; provide searchable logs, charts, and configurable alerts.
-- Integrate GitHub repositories and deployment/build status through scoped, revocable credentials.
-- Make remote terminal access an explicitly gated later capability; it is not an MVP requirement.
+Unrestricted remote shells, arbitrary cross-node command execution, autonomous remediation, GPU scheduling, and cross-cluster federation remain out of scope unless separately reviewed and approved.
 
-### Security and administration
+## Quality and acceptance criteria
 
-- Authenticate users and authorize actions with role-based permissions.
-- Securely enroll and revoke nodes; protect secrets and transport.
-- Record attributable audit events for privileged operations.
-- Require a clear confirmation step for dangerous actions and report their target and expected effect.
+For the Phase 1 dashboard, completion requires:
 
-## Non-functional requirements and targets
+1. The application runs locally using commands documented against the checked-in package manifest.
+2. All required dashboard areas are reachable through working navigation, including Agents and Automation.
+3. Topology selection and controls, local cluster management, catalog previews, and task records work against the persistent local provider. Hardware telemetry remains seeded sample data until a backend is available.
+4. Monitoring charts render typed historical demo data with clear time ranges and no false live-connectivity claims.
+5. Responsive behavior, keyboard access, visible focus, reduced-motion preferences, and performance mode are implemented.
+6. Type checking, linting, tests, and a production build pass using checked-in tooling.
+7. README and development documentation accurately explain setup, local record persistence, and backend integration limits.
 
-Targets below are requirements to validate during implementation, not measured performance claims.
+For future control-plane phases, acceptance criteria must additionally define threat model, authorization, enrollment/revocation, data handling, recovery, performance baselines, and operational support before production claims are made.
 
-- **Security:** deny by default; encrypted network paths; no embedded credentials; auditable privileged access; documented threat model and recovery process.
-- **Reliability:** show data age and collection failures; tolerate temporary node/control-plane disconnection without representing old samples as current.
-- **Performance:** design for incremental telemetry and bounded queries; establish measurable latency/resource budgets after MVP workload and hardware baselines are defined.
-- **Privacy:** document collected fields, retention, and outbound integrations; provide operator-controlled retention and deletion.
-- **Accessibility:** keyboard operation, semantic controls, readable contrast, and status that is not conveyed by color alone.
-- **Portability:** avoid hardware-vendor assumptions; containerized local deployment is the initial deployment proposal.
-- **Maintainability:** typed API contracts, migrations, supported dependency policy, automated checks, and documented interfaces.
+## Risks and assumptions
 
-## MVP boundary
-
-The proposed MVP is a secure, self-hosted, read-mostly control plane: user authentication, node enrollment/revocation, node inventory and labels, basic host telemetry, current node status, simple history/health views, and audit events for administration. Baseline secret protection—including no embedded credentials, protected storage/configuration, and log redaction—is required; a general-purpose secrets manager or broad secret distribution service is outside MVP scope. Exact identity provider, retention defaults, and authorization policy remain decision points. Work queues, remote commands, broad agent execution, Kubernetes deployment, and GitHub automation are outside initial scope.
-
-## Later and experimental capabilities
-
-- Later: job scheduling, richer alerting and log search, agent adapters, GitHub status integration, service controls, multi-user administration, Kubernetes deployment, and terminal access after security review.
-- Experimental: cross-cluster federation, automated remediation, AI-assisted operations, GPU scheduling, and policy-driven workflows. These require separate threat, reliability, and operator-control review.
-
-## Assumptions, limitations, dependencies, and risks
-
-- Operators control the control-plane host, network, database, and backups.
-- Nodes can initiate or receive an allowed encrypted connection according to the eventual deployment topology; NAT traversal is not assumed.
-- Metrics availability varies by kernel, permissions, and hardware. Unsupported values must be reported as unavailable.
-- PostgreSQL is the proposed durable store. Redis is optional and must be justified by measured queue, fanout, or cache needs.
-- External agent APIs, GitHub access, TLS certificates, and GPU drivers may require separate setup and may change independently.
-- A compromised control plane could affect enrolled nodes; isolation, narrow credentials, revocation, and recovery are critical risks.
-- Remote execution, advanced secrets-management and secret-distribution features, and autonomous remediation substantially expand the threat surface and are excluded from the MVP proposal. Baseline protection of credentials used by MVP services remains required.
-
-## Success measures
-
-Before release, define and measure: successful enrollment and revocation flows; telemetry freshness and completeness under representative test conditions; task completion and recovery behavior when later implemented; operator ability to identify stale/offline nodes; security findings resolved; and onboarding completion using only published documentation. No numeric target is asserted until a repeatable baseline exists.
-
-## Acceptance criteria for MVP planning
-
-- Architecture and interfaces distinguish control plane, node agent, and optional integrations.
-- Enrollment, revocation, authorization, audit, data retention, and failure states have reviewed designs before implementation.
-- Supported operating systems and metrics are explicitly capability-based.
-- MVP excludes unrestricted shell execution and unreviewed automated changes.
-- Documentation and CI validate only files and tools that exist.
-- Each delivered feature has tests, operational guidance, and evidence-based support claims.
+- Mock data can be mistaken for real telemetry; persistent labels and clear demo-only language are required.
+- UI contracts may evolve when the eventual API is designed; the local-provider boundary should remain explicit and typed.
+- Browser storage is suitable only for non-sensitive demo preferences, not secrets or operational state.
+- External products and APIs may change; catalog entries are informational placeholders until an integration is implemented and reviewed.
+- No performance or reliability targets are asserted for the eventual infrastructure product until measurable workloads and hardware baselines exist.

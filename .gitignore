@@ -34,3 +34,5 @@ coverage/
 # Local runtime data
 *.log
 data/
+!dashboard/src/data/
+!dashboard/src/data/**

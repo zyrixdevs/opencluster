@@ -2,20 +2,31 @@
 
 ## Current status
 
-OpenCluster is in Phase 0. No application package, backend, database schema, node agent, or runnable product exists. Repository checks below validate only Markdown links and project configuration.
+OpenCluster Phase 1 is the permanent standalone dashboard in `dashboard/`. It uses a validated IndexedDB provider for local records and localStorage for non-sensitive preferences. Seeded hardware telemetry is sample data. No backend, authentication service, node agent, remote execution, or cloud service is part of this phase.
 
 ## Prerequisites
 
 - Git
-- Python 3.12 or later for the current documentation check (standard library only)
+- Node.js 20.19+ (or 22.12+) and npm for the dashboard (Vite requirement)
+- Python 3.12 or later for documentation checks (standard library only)
 - Codex CLI only if you intend to use the project-local custom agents
 
-Node.js, PostgreSQL, Redis, Docker, and Kubernetes are not required for Phase 0. They will be needed only when the corresponding application or infrastructure work is approved.
+PostgreSQL, Redis, Docker, Kubernetes, credentials, and cloud services are not required to run the dashboard. The browser uses IndexedDB for structured local dashboard data.
 
 ## Local workflow
 
 ```sh
-git switch -c docs/your-change
+npm --prefix dashboard install
+npm --prefix dashboard run dev
+```
+
+The dev server prints its local URL. For checks, run:
+
+```sh
+npm --prefix dashboard run typecheck
+npm --prefix dashboard run lint
+npm --prefix dashboard test
+npm --prefix dashboard run build
 python -m unittest discover -s tests -v
 python scripts/check_docs.py
 ```
@@ -24,10 +35,19 @@ Before a pull request, inspect `git status`, review the diff, and verify that cl
 
 ## Style and dependencies
 
-TypeScript will use strict mode and TSX for React components. Python will use type annotations at public interfaces. Formatting and linting tools will be selected with the first application milestone; no application dependency manifests exist yet. Avoid adding dependencies to solve checks already covered by the standard library.
+TypeScript uses strict mode and TSX for React components. Biome handles dashboard formatting and linting; Vite builds the app, and Vitest runs focused dashboard tests. Python will use type annotations at public interfaces. Avoid adding dependencies to solve checks already covered by the standard library.
 
 Use Conventional Commits (for example `docs: clarify node enrollment proposal`). Releases will follow semantic versioning once a first release is planned; no release version has been declared.
+
+## Dashboard architecture and motion
+
+Each page is loaded on demand. Pages read structured records through the data access layer; IndexedDB stores local clusters, nodes, agent entities, workflows, task records, and sample telemetry. Browser storage holds only preferences. Agents and Automation are editable React Flow canvases and never invoke external services. Mission Control's optional 3D globe is lazy-loaded and has a selectable-node fallback when WebGL is unavailable. See [Dashboard Motion and Performance](DASHBOARD_PERFORMANCE.md) for animation responsibilities, tab-visibility pause, reduced-motion handling, and current limits.
 
 ## Codex agents
 
 Root instructions are in `AGENTS.md`; project-local agent roles are in `.codex/agents/`. The role files use Codex's supported standalone TOML format. No model, credential, or machine-specific path is pinned. See [agent orchestration](AGENT_ORCHESTRATION.md).
+## Dashboard navigation and motion
+
+The dashboard shell uses the grouped BranchedMenu for its workspace navigation and a compact Dock for quick links. The Home KPI cards use an accessible Counter animation; reduced-motion preferences show the final value immediately. These are local UI controls and do not imply live cluster connectivity.
+
+The automation editor debounces local persistence while nodes are being dragged. Pointer movement updates the canvas immediately; only the settled workflow snapshot is written to IndexedDB. Route-level visualization and chart chunks remain lazy loaded to keep the initial shell smaller.

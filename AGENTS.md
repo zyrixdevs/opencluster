@@ -2,7 +2,7 @@
 
 ## Mission and current scope
 
-OpenCluster is planned as a self-hosted control plane for cluster nodes, infrastructure, AI agents, and distributed workloads: **One dashboard. Every node. Total control.** The repository is currently in Phase 0. The dashboard, API, node agent, and deployment stack are not implemented. Do not build product features until a maintainer selects an implementation milestone.
+OpenCluster is a cluster operations platform: **One dashboard. Every node. Total control.** Phase 0 is complete. Phase 1 builds the permanent standalone React dashboard against a validated, persistent local data provider; seeded hardware telemetry remains clearly identified as sample data until backend services exist. Do not add a backend, authentication service, node agent, remote command execution, live software installation, or cloud dependency in Phase 1.
 
 ## Before changing anything
 
@@ -14,7 +14,8 @@ OpenCluster is planned as a self-hosted control plane for cluster nodes, infrast
 
 ## Repository organization
 
-- `frontend/` — planned React and TypeScript dashboard.
+- `frontend/` — existing Phase 0 placeholder; do not implement the Phase 1 dashboard here.
+- `dashboard/` — standalone production frontend in Phase 1, using IndexedDB for structured local records and localStorage for non-sensitive preferences; backend integration remains future work.
 - `backend/` — planned FastAPI control plane.
 - `node-agent/` — planned lightweight Linux node service.
 - `infrastructure/` — deployment and operations assets.
@@ -25,7 +26,7 @@ OpenCluster is planned as a self-hosted control plane for cluster nodes, infrast
 
 ## Architecture and security rules
 
-- Follow `docs/ARCHITECTURE.md`, `docs/SECURITY_ARCHITECTURE.md`, `docs/API_DESIGN.md`, and `docs/DATABASE_DESIGN.md`. They describe proposals until implementation exists.
+- Follow `docs/ARCHITECTURE.md`, `docs/SECURITY_ARCHITECTURE.md`, `docs/API_DESIGN.md`, and `docs/DATABASE_DESIGN.md`. They describe backend proposals until those services exist. The Phase 1 dashboard stores validated structured records in IndexedDB, non-sensitive preferences in localStorage, and clearly labeled sample telemetry in the local provider.
 - Keep module boundaries explicit. Frontend code must not access the database directly; the node agent must not trust control-plane input without authentication and authorization.
 - Default to least privilege. Privileged node actions require authenticated identity, authorization, audit records, bounded operations, and explicit confirmation where destructive.
 - Never expose unrestricted remote shells or arbitrary cross-node command execution. Do not add secrets to code, logs, examples, or fixtures.
@@ -51,7 +52,7 @@ Reviewers should check correctness, regressions, architecture and interface cons
 ## Tests and validation
 
 - Run focused checks for changed behavior, then relevant broader checks when they exist. Do not claim commands passed unless they were run.
-- During Phase 0, CI validates documentation links and repository configuration only. Application build workflows must wait until application manifests and build tooling exist.
+- CI validates documentation and the dashboard's checked-in typecheck, lint, test, and build scripts. Add workflows only for artifacts and tools that exist.
 - Add regression tests for non-trivial behavior, failure paths, and security-sensitive logic. Keep performance benchmarks reproducible and do not invent targets or results.
 
 ## Documentation requirements

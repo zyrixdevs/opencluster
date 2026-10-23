@@ -16,7 +16,7 @@ def broken_links(root: Path = ROOT) -> list[str]:
         # ORIGINAL (preserved, not deleted — disabled by comment):
         # if any(part.startswith(".") for part in markdown.relative_to(root).parts):
         #     continue
-        if ".git" in markdown.relative_to(root).parts:
+        if any(part in {".git", "node_modules", "dist"} for part in markdown.relative_to(root).parts):
             continue
         for target in LINK.findall(markdown.read_text(encoding="utf-8")):
             target = target.strip().split(maxsplit=1)[0].strip("<>")

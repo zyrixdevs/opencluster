@@ -4,6 +4,34 @@ This is a lightweight decision log. Proposals below are not implementation commi
 
 ## Proposed starting decisions
 
+### D-007 — Permanent dashboard with browser-local provider
+
+- **Status:** Accepted, 2026-10-22; supersedes the prototype wording in D-005.
+- **Decision:** Phase 1 is the permanent frontend application. Structured local records use IndexedDB with validation and seed only an empty workspace; localStorage is limited to non-sensitive preferences. Sample hardware telemetry is explicitly labeled.
+- **Reason:** Cluster, node, graph, workflow, and configuration editing should work before backend services exist and survive reloads.
+- **Limits:** No backend, authentication, node agent, live telemetry, remote command, installation, or workflow execution is implemented.
+
+### D-008 — React Flow for editable canvases
+
+- **Status:** Accepted, 2026-10-22; supersedes the SVG/HTML canvas preference in D-006 for Agents and Automation.
+- **Decision:** Use `@xyflow/react` for both editors, with separate domain schemas and persistence. Keep the optional Three.js globe route-lazy.
+- **Reason:** Both canvases require genuine graph editing, keyboard access, validation, and shared pan/zoom behavior.
+
+### D-005 — Dashboard-first Phase 1
+
+- **Status:** Superseded by D-007.
+- **Decision:** Build a standalone React/TypeScript dashboard in `dashboard/`, backed by a typed local mock-data interface. The dashboard demonstrates navigation and workflows only; its install, task, and cluster actions do not control real systems.
+- **Reason:** Establish the operator experience and data contracts without adding backend or infrastructure scope.
+- **Boundaries:** No backend, authentication service, node agent, remote execution, live installation, or cloud service. Persist only non-sensitive demo preferences in browser storage.
+- **Revisit when:** a maintainer approves the next backend/node-agent milestone and its security design.
+
+### D-006 — Page-split visualizations for Phase 1
+
+- **Status:** Superseded by D-008 for editable canvases; retained for lazy page/scene loading and the globe boundary.
+- **Decision:** Use lazy-loaded pages, SVG/HTML for agent and workflow canvases, and Three.js only for the optional Mission Control globe. Keep Framer Motion, GSAP, and Lenis responsibilities separate and honor reduced-motion, performance mode, and hidden tabs.
+- **Reason:** Deliver the requested visual experiences while keeping the initial application route lighter and preserving static/accessibility fallbacks.
+- **Revisit when:** production profiles show a need for graph virtualization, a different rendering engine, or tighter resource limits.
+
 ### D-001 — Foundation-only scope
 
 - **Status:** Accepted for Phase 0.
