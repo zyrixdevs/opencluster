@@ -246,6 +246,8 @@ export default function CrystalizedBall({
       visible = true,
       start = performance.now(),
       pointer = false;
+    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let reducedMotion = motionQuery.matches;
     const resize = () =>
       renderer.setSize(
         Math.max(1, host.clientWidth),
@@ -274,11 +276,7 @@ export default function CrystalizedBall({
       const s = settings.current;
       const t = (now - start) / 1000;
       const color = THREEColor(s.color);
-      const presence =
-        s.intro &&
-        !window.matchMedia("(prefers-reduced-motion: reduce)").matches
-          ? clamp(t / 1.1, 0, 1)
-          : 1;
+      const presence = s.intro && !reducedMotion ? clamp(t / 1.1, 0, 1) : 1;
       fieldUniforms.uSize.value = [renderer.width, renderer.height];
       dustUniforms.uSize.value = [renderer.width, renderer.height];
       fieldUniforms.uTime.value = t * s.speed;
@@ -311,12 +309,13 @@ export default function CrystalizedBall({
       dustUniforms.uColor.value = color;
       renderer.render({ scene: field });
       renderer.render({ scene: dust });
-      if (
-        !s.paused &&
-        !window.matchMedia("(prefers-reduced-motion: reduce)").matches
-      )
-        raf = requestAnimationFrame(draw);
+      if (!s.paused && !reducedMotion) raf = requestAnimationFrame(draw);
     };
+    const onMotionChange = (event: MediaQueryListEvent) => {
+      reducedMotion = event.matches;
+      if (!event.matches && visible && !raf) raf = requestAnimationFrame(draw);
+    };
+    motionQuery.addEventListener("change", onMotionChange);
     const onVisibility = () => {
       if (!document.hidden && visible && !raf)
         raf = requestAnimationFrame(draw);
@@ -333,6 +332,7 @@ export default function CrystalizedBall({
       io.disconnect();
       window.removeEventListener("pointermove", onMove);
       document.removeEventListener("visibilitychange", onVisibility);
+      motionQuery.removeEventListener("change", onMotionChange);
       field.geometry.remove();
       dust.geometry.remove();
       (field.program as Program).remove();

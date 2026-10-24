@@ -156,6 +156,8 @@ export default function LaserFlow({
     let visible = true,
       raf = 0,
       start = performance.now();
+    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let reducedMotion = motionQuery.matches;
     const intersection = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
       if (visible && !raf) raf = requestAnimationFrame(draw);
@@ -201,18 +203,14 @@ export default function LaserFlow({
       uniforms.uSpread.value = p.spread;
       uniforms.uFog.value = p.fog;
       uniforms.uTime.value = (now - start) * 0.001 * p.speed;
-      if (
-        !p.paused &&
-        !window.matchMedia("(prefers-reduced-motion: reduce)").matches
-      )
-        renderer.render(scene, camera);
-      else if (p.paused) renderer.render(scene, camera);
-      if (
-        !p.paused &&
-        !window.matchMedia("(prefers-reduced-motion: reduce)").matches
-      )
-        raf = requestAnimationFrame(draw);
+      renderer.render(scene, camera);
+      if (!p.paused && !reducedMotion) raf = requestAnimationFrame(draw);
     };
+    const onMotionChange = (event: MediaQueryListEvent) => {
+      reducedMotion = event.matches;
+      if (visible && !raf) raf = requestAnimationFrame(draw);
+    };
+    motionQuery.addEventListener("change", onMotionChange);
     const onVisibility = () => {
       if (!document.hidden && visible && !raf)
         raf = requestAnimationFrame(draw);
@@ -228,6 +226,7 @@ export default function LaserFlow({
       observer.disconnect();
       intersection.disconnect();
       document.removeEventListener("visibilitychange", onVisibility);
+      motionQuery.removeEventListener("change", onMotionChange);
       window.removeEventListener("pointermove", move);
       geometry.dispose();
       material.dispose();
