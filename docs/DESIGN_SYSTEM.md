@@ -4,13 +4,15 @@
 
 ## Direction
 
-OpenCluster should read as a professional infrastructure command center: dark-first, restrained, information-dense, and calm under operational pressure. Favor clear hierarchy and consistent alignment over decorative effects. Support beginner homelab users with plain labels and useful empty states while retaining fast scanning and filters for experienced administrators.
+OpenCluster uses a Wise-inspired visual language adapted for infrastructure operations: pale sage page canvas, white rounded cards, warm near-black text, and lime-green primary actions. Keep status semantics and data density clear; do not imitate Wise's financial product language or imply an affiliation.
 
-The dashboard uses a dark graphite foundation, blue/cyan holographic accents, and subtle glass-like surfaces. Sora is used for display headings and Inter for dense UI text and labels. Font files are bundled locally; page rendering does not depend on a font CDN.
+Use Inter Variable for interface and display text; Wise Sans is proprietary and is not bundled. Use heavy display headings for page and Home titles, neutral Inter for operational data, 24px card/button radii, 12px form controls, and generous whitespace. Font files are bundled locally; page rendering does not depend on a font CDN.
+
+Light theme is the default for new local workspaces and uses `#e8ebe6` canvas, white surfaces, `#0e0f0c` ink, and `#9fe870` primary actions. Existing saved theme preferences remain respected. Dark theme keeps the same lime accent over near-black canvas and softened dark surfaces. Semantic health colors remain distinct from the brand accent.
 
 ## Layout and navigation
 
-Use a persistent primary navigation for Home, Mission Control, Clusters, Nodes, Agents, Automation, AI Software, Tasks, Monitoring, Activity, and Settings. Keep global cluster context and demo status visible. Desktop layouts prioritize multi-column comparison and information density; tablet collapses secondary navigation; mobile prioritizes status, search, and focused detail views.
+Use the existing persistent sidebar, top bar, and primary navigation for Home, Mission Control, Clusters, Nodes, Agents, Automation, AI Software, Tasks, Monitoring, Activity, and Settings. Keep global cluster context and demo status visible. Desktop layouts prioritize multi-column comparison and information density; tablet collapses secondary navigation; mobile prioritizes status, search, and focused detail views.
 
 ## Component categories
 
@@ -20,7 +22,11 @@ Use a persistent primary navigation for Home, Mission Control, Clusters, Nodes, 
 - **Actions:** labeled buttons, forms, confirmation dialogs, permission explanations.
 - **Feedback:** skeleton/loading, empty, stale, partial-data, error, and success states.
 
-Prefer reusable accessible TSX components and utility classes. Use shadcn/ui and Lucide React where they fit; React Bits only when motion or visual treatment improves comprehension. Minimize handwritten CSS and avoid adding motion that distracts from changing operational state.
+Prefer reusable accessible TSX components and utility classes. Use the existing Lucide React and animation packages. React Bits-inspired components are used only where they fit a real dashboard touchpoint; decorative GPU scenes are lazy-loaded, particle counts are bounded, and reduced-motion/performance settings are honored. Avoid motion that distracts from changing operational state.
+
+The **Component Lab** route exposes the supplied component set for hands-on use and review. Its prompt composer saves a local note and its context meter reports a rough local token estimate; it does not contact an AI service. Profile choices update the local display name, notifications use the existing browser preference, and the timezone/date tools report only local comparisons. Crystal and laser scenes remain decorative sample visuals.
+
+Motion follows the same restrained sequence across pages: route container, headings and panels, then data visualization. Shared durations and easing live in `dashboard/src/animations/motion.ts`; charts animate only on first display and meaningful selection changes. The theme reveal starts at the selected control and falls back to an immediate update when reduced motion, performance mode, or browser support requires it.
 
 ## Data visualization and status
 
@@ -32,4 +38,4 @@ Target keyboard access, visible focus, semantic headings and controls, screen-re
 
 ## Visual tokens to define during implementation
 
-Choose a restrained neutral dark palette with a small semantic accent set, consistent spacing and radii, readable tabular numerals for metrics, and a clear type scale. Exact color values, typefaces, and contrast ratios must be selected and checked in the implemented theme; this document does not claim they have been tested.
+Use the palette, type, spacing, and radius tokens documented above and in `dashboard/src/styles.css`. Keep readable tabular numerals for metrics. Visual review and contrast measurement have not yet been completed for the Wise-inspired reskin.

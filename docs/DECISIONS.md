@@ -4,6 +4,20 @@ This is a lightweight decision log. Proposals below are not implementation commi
 
 ## Proposed starting decisions
 
+### D-010 — Reuse dashboard motion stack for premium transitions
+
+- **Status:** Accepted, 2026-10-25.
+- **Decision:** Keep Framer Motion for route/component transitions, Recharts for analytics, and the existing reduced-motion/performance preferences. Centralize shared timing/easing in `dashboard/src/animations/motion.ts`; use the View Transitions API for a 520ms circular theme reveal with an immediate fallback.
+- **Reason:** Apply the supplied dashboard motion references while preserving local state, canvas editors, routing, and accessibility.
+- **Limits:** The View Transitions API is browser-dependent; fallback changes theme instantly. WebGL/canvas performance was not profiled on physical hardware.
+
+### D-009 — Wise-inspired dashboard visual system
+
+- **Status:** Accepted, 2026-10-23.
+- **Decision:** Adapt the supplied Wise design reference into a light sage canvas, white rounded cards, warm near-black type, lime-green primary actions, and a matching dark theme. Use bundled Inter Variable rather than the proprietary Wise Sans font. Preserve OpenCluster's navigation, data hierarchy, status semantics, and local-only scope.
+- **Reason:** Apply the requested visual direction without borrowing Wise product copy or making the infrastructure dashboard resemble a money-transfer flow.
+- **Limits:** This is an inspired visual adaptation, not a Wise brand asset or affiliation. Contrast and browser visual review remain to be completed.
+
 ### D-007 — Permanent dashboard with browser-local provider
 
 - **Status:** Accepted, 2026-10-22; supersedes the prototype wording in D-005.

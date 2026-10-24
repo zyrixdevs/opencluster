@@ -12,6 +12,7 @@ import {
   Grid2X2,
   Layers3,
   Menu,
+  Puzzle,
   Search,
   Settings,
   Sparkles,
@@ -22,9 +23,12 @@ import {
 import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { pageTransition, pageVariants } from "../animations/motion";
 import { useDashboardStore } from "../state/useDashboardStore";
 import { BranchedMenu } from "./BranchedMenu";
 import { Dock } from "./Dock";
+import { BellToggle } from "./react-bits/controls";
+import { AnimatedThemeToggler } from "./react-bits/utilities";
 import { Button } from "./ui";
 
 const navItems = [
@@ -37,6 +41,7 @@ const navItems = [
   { label: "AI Software", to: "/software", icon: TerminalSquare },
   { label: "Tasks", to: "/tasks", icon: Activity },
   { label: "Monitoring", to: "/monitoring", icon: Gauge },
+  { label: "Component Lab", to: "/component-lab", icon: Puzzle },
   { label: "Activity", to: "/activity", icon: Bell },
 ];
 const routeNames: Record<string, string> = {
@@ -51,6 +56,7 @@ const routeNames: Record<string, string> = {
   "/monitoring": "Monitoring",
   "/activity": "Activity",
   "/settings": "Settings",
+  "/component-lab": "Component Lab",
 };
 const branchedItems = [
   { label: "Overview", value: "/", icon: <Grid2X2 size={16} /> },
@@ -66,6 +72,11 @@ const branchedItems = [
       { value: "/nodes", label: "Nodes", icon: <Cpu size={16} /> },
       { value: "/monitoring", label: "Monitoring", icon: <Gauge size={16} /> },
       { value: "/activity", label: "Activity", icon: <Bell size={16} /> },
+      {
+        value: "/component-lab",
+        label: "Component Lab",
+        icon: <Puzzle size={16} />,
+      },
     ],
   },
   {
@@ -113,6 +124,7 @@ export function AppShell() {
   const collapsed = useDashboardStore((s) => s.sidebarCollapsed);
   const toggleSidebar = useDashboardStore((s) => s.toggleSidebar);
   const theme = useDashboardStore((s) => s.theme);
+  const setTheme = useDashboardStore((s) => s.setTheme);
   const demoMotion = useDashboardStore((s) => s.demoMotion);
   const compactDashboard = useDashboardStore((s) => s.compactDashboard);
   const performanceMode = useDashboardStore((s) => s.performanceMode);
@@ -123,12 +135,28 @@ export function AppShell() {
     (s) => s.clearPersistenceError,
   );
   const prefersReducedMotion = useReducedMotion();
+  const [systemTheme, setSystemTheme] = useState<"light" | "dark">("light");
   const [searchOpen, setSearchOpen] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [query, setQuery] = useState("");
   const searchInput = useRef<HTMLInputElement>(null);
   useEffect(() => {
+    const readPreference = () =>
+      setNotificationsEnabled(
+        localStorage.getItem("opencluster.notifications") !== "false",
+      );
+    readPreference();
+    window.addEventListener("opencluster:notifications-change", readPreference);
+    return () =>
+      window.removeEventListener(
+        "opencluster:notifications-change",
+        readPreference,
+      );
+  }, []);
+  useEffect(() => {
     const media = window.matchMedia("(prefers-color-scheme: light)");
     const updateTheme = () => {
+      setSystemTheme(media.matches ? "light" : "dark");
       document.documentElement.dataset.theme =
         theme === "system" ? (media.matches ? "light" : "dark") : theme;
     };
@@ -292,6 +320,12 @@ export function AppShell() {
             <strong>{routeNames[location.pathname] ?? "Dashboard"}</strong>
           </div>
           <div className="top-actions">
+            <AnimatedThemeToggler
+              theme={theme === "system" ? systemTheme : theme}
+              onThemeChange={setTheme}
+              className="top-theme-toggle"
+              title="Change dashboard theme"
+            />
             <Button
               variant="secondary"
               className="search-trigger"
@@ -305,12 +339,27 @@ export function AppShell() {
             </Button>
             <Button
               variant="ghost"
-              aria-label="Notifications"
+              aria-label="Activity"
               onClick={() => navigate("/activity")}
             >
-              <Bell size={17} />
-              <span className="notification-dot" />
+              <Activity size={17} />
+              {notificationsEnabled && <span className="notification-dot" />}
             </Button>
+            <BellToggle
+              checked={notificationsEnabled}
+              onCheckedChange={(enabled) => {
+                localStorage.setItem(
+                  "opencluster.notifications",
+                  String(enabled),
+                );
+                setNotificationsEnabled(enabled);
+                window.dispatchEvent(
+                  new Event("opencluster:notifications-change"),
+                );
+              }}
+              label="Activity notifications"
+              className="top-notification-toggle"
+            />
             <span className="top-divider" />
             <div className="top-avatar" title="Demo operator">
               OC
@@ -338,11 +387,12 @@ export function AppShell() {
               className="page-transition"
               initial={
                 demoMotion && !performanceMode && !prefersReducedMotion
-                  ? { opacity: 0, y: 8 }
+                  ? "initial"
                   : false
               }
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.24, ease: "easeOut" }}
+              animate="enter"
+              variants={pageVariants}
+              transition={pageTransition}
             >
               <Outlet />
             </motion.div>

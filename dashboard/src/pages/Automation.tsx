@@ -222,7 +222,7 @@ function Editor() {
   };
   const addNode = (kind: WorkflowKind, position?: { x: number; y: number }) => {
     snapshot();
-    const id = kind + "-" + crypto.randomUUID().slice(0, 6);
+    const id = `${kind}-${crypto.randomUUID().slice(0, 6)}`;
     const title = kind[0].toUpperCase() + kind.slice(1);
     setNodes((current) => [
       ...current,
@@ -233,7 +233,7 @@ function Editor() {
           x: 160 + (current.length % 4) * 220,
           y: 120 + Math.floor(current.length / 4) * 140,
         },
-        data: { title, detail: title + " demo step.", kind, config: {} },
+        data: { title, detail: `${title} demo step.`, kind, config: {} },
       },
     ]);
     setSelectedId(id);
@@ -262,8 +262,7 @@ function Editor() {
     );
     const a = document.createElement("a");
     a.href = url;
-    a.download =
-      (name.toLowerCase().replace(/[^a-z0-9]+/g, "-") || "workflow") + ".json";
+    a.download = `${name.toLowerCase().replace(/[^a-z0-9]+/g, "-") || "workflow"}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -313,7 +312,7 @@ function Editor() {
   const duplicateSelected = () => {
     if (!selected) return;
     snapshot();
-    const id = selected.id + "-copy-" + crypto.randomUUID().slice(0, 5);
+    const id = `${selected.id}-copy-${crypto.randomUUID().slice(0, 5)}`;
     setNodes((current) => [
       ...current,
       {
@@ -321,7 +320,7 @@ function Editor() {
         id,
         selected: true,
         position: { x: selected.position.x + 36, y: selected.position.y + 36 },
-        data: { ...selected.data, title: selected.data.title + " copy" },
+        data: { ...selected.data, title: `${selected.data.title} copy` },
       },
     ]);
     setSelectedId(id);
@@ -499,12 +498,12 @@ function Editor() {
             </ReactFlow>
           </section>
           <div className="automation-runbar" role="status" aria-live="polite">
-            <span className={"run-indicator " + (running ? "is-running" : "")}>
+            <span className={`run-indicator ${running ? "is-running" : ""}`}>
               <span />
             </span>
             <span>{message}</span>
             <small>
-              {runs ? "RUN #" + String(runs).padStart(2, "0") : "NO RUNS YET"}
+              {runs ? `RUN #${String(runs).padStart(2, "0")}` : "NO RUNS YET"}
             </small>
           </div>
         </section>
