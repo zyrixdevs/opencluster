@@ -141,7 +141,7 @@ export const useDashboardStore = create<DashboardState>()(
       visualQuality: "auto",
       demoDataset: "multi-cluster",
       persistenceError: null,
-      theme: "dark",
+      theme: "light",
       addCluster: (name, region, description) =>
         serializeLocalMutation(async () => {
           const state = useDashboardStore.getState();
@@ -326,7 +326,7 @@ export const useDashboardStore = create<DashboardState>()(
             motionMode: "system",
             performanceMode: false,
             visualQuality: "auto",
-            theme: "dark",
+            theme: "light",
             demoDataset: "multi-cluster",
           });
           void dashboardQueryClient.invalidateQueries();
@@ -442,7 +442,7 @@ export const useDashboardStore = create<DashboardState>()(
           theme:
             old?.theme === "light" || old?.theme === "system"
               ? old.theme
-              : "dark",
+              : "light",
         };
       },
       merge: (persisted, current) => {
@@ -481,7 +481,7 @@ export const useDashboardStore = create<DashboardState>()(
           theme:
             saved?.theme === "light" || saved?.theme === "system"
               ? saved.theme
-              : "dark",
+              : "light",
           motionMode:
             saved?.motionMode === "reduced" || saved?.motionMode === "cinematic"
               ? saved.motionMode

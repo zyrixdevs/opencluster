@@ -1,3 +1,4 @@
+import { useReducedMotion } from "framer-motion";
 import {
   ChevronDown,
   CircleAlert,
@@ -5,14 +6,23 @@ import {
   Layers3,
   Orbit,
   Share2,
+  // ORIGINAL (preserved, not deleted — disabled by comment): Sparkles,
+  Waves,
 } from "lucide-react";
 import { lazy, Suspense, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { LatticeLoader } from "../components/react-bits/controls";
+import CountUp from "../components/react-bits/text/CountUp";
 import { Topology } from "../components/Topology";
 import { Button, LoadingState, PageTitle, Progress } from "../components/ui";
 import type { Health } from "../data/models";
 import { useDemoData } from "../data/useDashboardData";
+import { useDashboardStore } from "../state/useDashboardStore";
 
+// ORIGINAL (preserved, not deleted — disabled by comment): const CrystalizedBall = lazy(() => import("../components/react-bits/visuals/CrystalizedBall"));
+const LaserFlow = lazy(
+  () => import("../components/react-bits/visuals/LaserFlow"),
+);
 const GlobeScene = lazy(() =>
   import("../components/GlobeScene").then((module) => ({
     default: module.GlobeScene,
@@ -21,7 +31,11 @@ const GlobeScene = lazy(() =>
 
 export function MissionPage() {
   const { cluster, nodes, clusters } = useDemoData();
-  const [layout, setLayout] = useState<"topology" | "orbit" | "globe">("globe");
+  const [layout, setLayout] = useState<
+    "topology" | "orbit" | "globe" | "laser"
+  >("globe");
+  const performanceMode = useDashboardStore((state) => state.performanceMode);
+  const reducedMotion = useReducedMotion();
   const [healthFilter, setHealthFilter] = useState<Health | "all">("all");
   const visibleNodes = useMemo(
     () =>
@@ -87,6 +101,14 @@ export function MissionPage() {
           >
             <Globe2 size={13} /> 3D globe
           </Button>
+          {/* ORIGINAL (preserved, not deleted — disabled by comment): <Button className={layout === "crystal" ? "selected" : ""} aria-pressed={layout === "crystal"} onClick={() => setLayout("crystal")}><Sparkles size={13} /> Crystal orb</Button> */}
+          <Button
+            className={layout === "laser" ? "selected" : ""}
+            aria-pressed={layout === "laser"}
+            onClick={() => setLayout("laser")}
+          >
+            <Waves size={13} /> Laser flow
+          </Button>
         </fieldset>
         <fieldset className="mission-filters">
           <legend className="sr-only">Filter nodes by health</legend>
@@ -107,6 +129,34 @@ export function MissionPage() {
       {layout === "globe" ? (
         <Suspense fallback={<LoadingState label="Loading 3D cluster globe" />}>
           <GlobeScene nodes={visibleNodes} />
+        </Suspense> /* ORIGINAL (preserved, not deleted — disabled by comment):
+        : layout === "crystal" ? (
+          <Suspense fallback={<div className="visual-loader"><LatticeLoader label="Loading crystal orb" /></div>}>
+            <div className="mission-visual-preview" role="img" aria-label="Decorative sample crystal visualization; does not represent live node data">
+              <CrystalizedBall preset="eclipse" particleCount={3500} paused={performanceMode || Boolean(reducedMotion)} />
+            </div>
+          </Suspense>
+      */
+      ) : layout === "laser" ? (
+        <Suspense
+          fallback={
+            <div className="visual-loader">
+              <LatticeLoader label="Loading laser flow" />
+            </div>
+          }
+        >
+          <div
+            className="mission-visual-preview"
+            role="img"
+            aria-label="Decorative sample laser light visualization; does not represent live node data"
+          >
+            <LaserFlow
+              color="#55d6f0"
+              intensity={1.1}
+              speed={performanceMode || reducedMotion ? 0 : 0.65}
+              paused={performanceMode || Boolean(reducedMotion)}
+            />
+          </div>
         </Suspense>
       ) : (
         <Topology nodes={visibleNodes} layout={layout} />
@@ -114,12 +164,16 @@ export function MissionPage() {
       <div className="mission-analytics">
         <div className="mission-metric">
           <span>AVERAGE CPU</span>
-          <b>{averageCpu}%</b>
+          <b>
+            <CountUp from={0} to={averageCpu} suffix="%" duration={1.2} />
+          </b>
           <Progress value={averageCpu} />
         </div>
         <div className="mission-metric">
           <span>AVERAGE MEMORY</span>
-          <b>{averageMemory}%</b>
+          <b>
+            <CountUp from={0} to={averageMemory} suffix="%" duration={1.2} />
+          </b>
           <Progress value={averageMemory} tone="purple" />
         </div>
         <div className="mission-metric mission-alerts">

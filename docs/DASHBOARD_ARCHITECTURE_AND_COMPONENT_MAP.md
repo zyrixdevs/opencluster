@@ -5,7 +5,7 @@
 **Status:** Implementation blueprint  
 **Repository:** `https://github.com/zyrixdevs/opencluster`  
 **Scope:** create **only** the top-level `dashboard/` application and compatible documentation  
-**Last updated:** 2026-10-22
+**Last updated:** 2026-10-23
 
 > **Implementation status:** This document began as the dashboard architecture specification. Phase 1 now uses the implemented structure under `dashboard/src/`: `data/localProvider.ts` (IndexedDB and validation), `data/providerContracts.ts` (provider contracts), TanStack Query collection hooks, Zustand preferences, and feature pages. Proposals below describe intent; the shipped structure and provider behavior take precedence where the original component map differs.
 
@@ -24,7 +24,7 @@ OpenCluster Phase 1 is the permanent client application using **Vite + strict Ty
 | Async data contract | TanStack Query | Data caching hooks; IndexedDB provider now, remote provider later |
 | Local UI state | Zustand | Selected entities, inspector visibility, preferences |
 | Spatial graph editors | `@xyflow/react` | Agents graph and Automation canvas interaction |
-| 3D scenes | Three.js + React Three Fiber (R3F), Drei if needed | Home hologram and Mission Control globe |
+| 3D scenes | Three.js + React Three Fiber (R3F), Drei if needed | Mission Control globe and optional laser; OGL crystal orb in the Home hero |
 | Plots | Recharts | Monitoring and lightweight metrics |
 | UI motion | Motion for React (`motion/react`) | Cards, panels, route/page transitions |
 | Sequenced motion | GSAP | Rare hero choreography |
@@ -212,14 +212,15 @@ main.tsx
          │  ├─ DemoBadge
          │  └─ NotificationMenu
          ├─ RouteOutlet
-         │  ├─ HomePage → WelcomeHero/HologramStage → SignalOrbScene (lazy)
-         │  ├─ MissionControlPage → TopologyCanvas OR ClusterGlobeScene (lazy)
+         │  ├─ HomePage → SplitText/BlurText welcome copy
+         │  ├─ MissionControlPage → topology/orbit/globe OR optional laser visual (lazy)
          │  ├─ ClustersPage / ClusterDetailsPage
          │  ├─ NodesPage / NodeDetailsPage
          │  ├─ AgentsPage → AgentGraphCanvas OR AgentConstellation
          │  ├─ AutomationListPage / WorkflowEditorPage → WorkflowCanvas
          │  ├─ SoftwarePage → InstallPreviewWizard
          │  ├─ MonitoringPage → MetricCharts
+         │  ├─ ComponentLabPage → curated text, control, utility, and lazy visual demos
          │  ├─ ActivityPage → EventTimeline
          │  └─ SettingsPage → VisualQualitySettings
          └─ GlobalOverlays → Toasts / Dialogs / Confirmation / InspectorPortal
@@ -412,7 +413,7 @@ Create a shared **CanvasFrame**, **CanvasToolbar**, **GraphInspectorLayout**, **
 
 ## 8. 3D hologram architecture and failure isolation
 
-- Home route lazy imports `HologramStage` → `SignalOrbScene`; Mission Control lazy imports `ClusterGlobeScene` only when Globe mode selected.
+- Home uses SplitText/BlurText for welcome copy and a lazy OGL CrystalizedBall in the hero. Mission Control lazy imports its optional laser visual; the globe remains a lazy Three.js mode.
 - Wrap scenes with React `Suspense` and error boundary; static SVG/poster fallback handles WebGL disabled/context-loss and loading.
 - Use small, reused buffers/instanced particles; avoid allocating geometry/materials in render loops.
 - Use quality-dependent `[min, max]` DPR (e.g. `[1, 1.5]` on desktop, lower on weaker devices) and capped geometry/particle budgets.
@@ -420,6 +421,10 @@ Create a shared **CanvasFrame**, **CanvasToolbar**, **GraphInspectorLayout**, **
 - Recompute only when scene props change; separate time updates from React state updates.
 - Use WebGL context cleanup and detection; scene never steals pointer actions from adjacent cards.
 - `prefers-reduced-motion`, performance mode, and tab visibility can all disable continuous motion.
+
+The Home crystal and optional Mission Control laser are decorative sample-data visuals, not live cluster telemetry. Both respect performance/reduced-motion settings. The Wise-inspired skin and component adaptations are documented in `docs/DESIGN_SYSTEM.md`; effects without a real dashboard touchpoint remain available on the Component Lab route.
+
+The `/component-lab` route makes the supplied SplitText, BlurText, CountUp, LaserFlow, PromptBar, AIContextMeter, ParticleButton, BellToggle, BellButton, SwitchButton, StatusMark, SwipeRow, LatticeLoader, DateRangeCalendar, TimezonePlanner, AccountMenu, AnimatedBeam, and AnimatedThemeToggler available in one interactive page. The CrystalizedBall appears only in the Home hero. Local-only controls do not imply backend functionality.
 
 **Scene design:** original teal/blue orbital signal mesh with rings, arcs and sparse particles; glowing globe with optional demo markers. No copy of proprietary graphic assets, no copyrighted JARVIS marks.
 
@@ -525,6 +530,8 @@ Before acting, Codex must inspect root `AGENTS.md`, `.codex/`, `docs/`, branch s
 **Parallel safe boundaries:** a UI component workstream can implement independent shared primitives while data/domain types are established; mission scene and monitoring can be parallel after contracts stabilize. Avoid concurrent modifications to `router.tsx`, shared theme tokens, `package.json` or the same graph model. Merge small, tested increments.
 
 ## 15. `dashboard/package.json` script contract
+
+Shared route/card/chart timing and easing are defined in `dashboard/src/animations/motion.ts`. The View Transitions API theme reveal is implemented in `dashboard/src/animations/theme-transition.ts`; its immediate fallback is used for reduced-motion and performance settings. React Flow node positions remain owned by the graph editor.
 
 The application should expose at minimum:
 

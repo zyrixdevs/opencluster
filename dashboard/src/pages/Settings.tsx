@@ -1,6 +1,8 @@
 import { useQueryClient } from "@tanstack/react-query";
 import * as Icons from "lucide-react";
 import { useState } from "react";
+import { transitionTheme } from "../animations/theme-transition";
+import { BellToggle, ParticleButton } from "../components/react-bits/controls";
 import * as UI from "../components/ui";
 import { useDashboardStore } from "../state/useDashboardStore";
 
@@ -22,6 +24,9 @@ export function SettingsPage() {
   const resetDemoData = useDashboardStore((s) => s.resetDemoData);
   const queryClient = useQueryClient();
   const [saved, setSaved] = useState("");
+  const [notificationsEnabled, setNotificationsEnabled] = useState(
+    () => localStorage.getItem("opencluster.notifications") !== "false",
+  );
   return (
     <>
       <UI.PageTitle
@@ -67,7 +72,8 @@ export function SettingsPage() {
               <div>
                 <b>Theme</b>
                 <small>
-                  Dark is the recommended command-center appearance.
+                  Choose a theme or follow your system preference. Changes apply
+                  immediately.
                 </small>
               </div>
               <div className="theme-options">
@@ -76,7 +82,18 @@ export function SettingsPage() {
                     type="button"
                     key={value}
                     className={theme === value ? "selected" : ""}
-                    onClick={() => setTheme(value)}
+                    onClick={(event) => {
+                      const next =
+                        value === "system"
+                          ? window.matchMedia("(prefers-color-scheme: light)")
+                              .matches
+                            ? "light"
+                            : "dark"
+                          : value;
+                      transitionTheme(event.currentTarget, next, () =>
+                        setTheme(value),
+                      );
+                    }}
                   >
                     {value[0].toUpperCase() + value.slice(1)}
                   </button>
@@ -194,6 +211,26 @@ export function SettingsPage() {
               </div>
               <Icons.Check size={16} className="accent-icon" />
             </div>
+            <div className="setting-row">
+              <div>
+                <b>Activity notifications</b>
+                <small>Show the activity indicator in the top bar.</small>
+              </div>
+              <BellToggle
+                checked={notificationsEnabled}
+                onCheckedChange={(enabled) => {
+                  setNotificationsEnabled(enabled);
+                  localStorage.setItem(
+                    "opencluster.notifications",
+                    String(enabled),
+                  );
+                  window.dispatchEvent(
+                    new Event("opencluster:notifications-change"),
+                  );
+                }}
+                label="Activity notifications"
+              />
+            </div>
           </UI.Card>
           <UI.Card id="demo" className="settings-card">
             <div className="settings-card-heading">
@@ -267,27 +304,36 @@ export function SettingsPage() {
                   Restore the original sample content and default settings.
                 </small>
               </div>
-              <UI.Button
-                onClick={async () => {
+              {/* ORIGINAL (preserved, not deleted — disabled by comment): <UI.Button onClick={async () => { if (window.confirm("Reset local clusters, nodes, workflows, graph layouts, and preferences? This cannot be undone.")) { try { await resetDemoData(); await queryClient.invalidateQueries(); setSaved("Sample records and preferences restored."); } catch { setSaved("Local reset failed. Your records were not confirmed as reset."); } } }}>Reset sample data</UI.Button> */}
+              <ParticleButton
+                className="button button-secondary"
+                onClick={(event) => {
                   if (
-                    window.confirm(
+                    !window.confirm(
                       "Reset local clusters, nodes, workflows, graph layouts, and preferences? This cannot be undone.",
                     )
                   ) {
-                    try {
-                      await resetDemoData();
-                      await queryClient.invalidateQueries();
-                      setSaved("Sample records and preferences restored.");
-                    } catch {
+                    event.preventDefault();
+                    return;
+                  }
+                  return resetDemoData()
+                    .then(() => queryClient.invalidateQueries())
+                    .then(() =>
+                      setSaved("Sample records and preferences restored."),
+                    )
+                    .catch(() => {
                       setSaved(
                         "Local reset failed. Your records were not confirmed as reset.",
                       );
-                    }
-                  }
+                      throw new Error("Local reset failed");
+                    });
                 }}
+                pendingLabel="Resetting…"
+                successLabel="Reset complete"
+                errorLabel="Reset failed"
               >
                 Reset sample data
-              </UI.Button>
+              </ParticleButton>
             </div>
           </UI.Card>
           <UI.Card id="integrations" className="settings-card">

@@ -39,6 +39,11 @@ const ActivityPage = lazy(() =>
 const SettingsPage = lazy(() =>
   import("./Settings").then((module) => ({ default: module.SettingsPage })),
 );
+const ComponentLabPage = lazy(() =>
+  import("./ComponentLab").then((module) => ({
+    default: module.ComponentLabPage,
+  })),
+);
 const NotFoundPage = lazy(() =>
   import("./NotFound").then((module) => ({ default: module.NotFoundPage })),
 );
@@ -83,6 +88,7 @@ export function DashboardApp() {
             <Route path="monitoring" element={<MonitoringPage />} />
             <Route path="activity" element={<ActivityPage />} />
             <Route path="settings" element={<SettingsPage />} />
+            <Route path="component-lab" element={<ComponentLabPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Routes>
