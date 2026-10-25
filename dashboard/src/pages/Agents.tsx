@@ -110,17 +110,17 @@ function AgentFlowCard({ data }: NodeProps<FlowNode>) {
       <Handle
         type="target"
         position={Position.Left}
-        aria-label={"Relations into " + agent.name}
+        aria-label={`Relations into ${agent.name}`}
       />
       <div
-        className={"agent-flow-card " + agent.color}
+        className={`agent-flow-card ${agent.color}`}
         role="img"
-        aria-label={agent.name + ", " + agent.kind + ", " + agent.status}
+        aria-label={`${agent.name}, ${agent.kind}, ${agent.status}`}
       >
         <span className="agent-flow-icon">
           <AgentGlyph icon={agent.icon} />
         </span>
-        <span className={"agent-flow-status " + agent.status} />
+        <span className={`agent-flow-status ${agent.status}`} />
         <small>{agent.kind.toUpperCase()}</small>
         <strong>{agent.name}</strong>
         <em>{agent.status.toUpperCase()}</em>
@@ -128,7 +128,7 @@ function AgentFlowCard({ data }: NodeProps<FlowNode>) {
       <Handle
         type="source"
         position={Position.Right}
-        aria-label={"Relations from " + agent.name}
+        aria-label={`Relations from ${agent.name}`}
       />
     </>
   );
@@ -150,7 +150,7 @@ function asEdges(relations: AgentRelation[], selectedId: string): Edge[] {
     const highlighted =
       relation.source === selectedId || relation.target === selectedId;
     return {
-      id: relation.source + ":" + relation.target,
+      id: `${relation.source}:${relation.target}`,
       source: relation.source,
       target: relation.target,
       label: highlighted ? relation.label : undefined,
@@ -196,8 +196,12 @@ function AgentsContent() {
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const flow = useReactFlow();
   const selected = agents.find((agent) => agent.id === selectedId) ?? agents[0];
-  const selectedEdges = relations.filter(
-    (edge) => edge.source === selected?.id || edge.target === selected?.id,
+  const selectedEdges = useMemo(
+    () =>
+      relations.filter(
+        (edge) => edge.source === selected?.id || edge.target === selected?.id,
+      ),
+    [relations, selected?.id],
   );
 
   useEffect(() => {
@@ -371,7 +375,7 @@ function AgentsContent() {
     );
 
   return (
-    <main className={"agents-page" + (live ? "" : " motion-off")}>
+    <main className={`agents-page${live ? "" : " motion-off"}`}>
       <PageTitle
         eyebrow="AI AGENT WORKSPACE"
         title="Agents"
@@ -459,7 +463,7 @@ function AgentsContent() {
           </div>
           <section
             className="agents-graph-wrap agents-reactflow"
-            aria-label={mode + " relationship graph"}
+            aria-label={`${mode} relationship graph`}
           >
             <ReactFlow
               nodes={nodes}
@@ -523,12 +527,12 @@ function AgentsContent() {
                 / {String(agents.length).padStart(2, "0")}
               </span>
             </div>
-            <span className={"agents-status-chip " + selected.status}>
+            <span className={`agents-status-chip ${selected.status}`}>
               <i />
               {selected.status}
             </span>
           </div>
-          <div className={"agents-profile-mark " + selected.color}>
+          <div className={`agents-profile-mark ${selected.color}`}>
             <AgentGlyph icon={selected.icon} />
           </div>
           <h2>{selected.name}</h2>
@@ -636,11 +640,11 @@ function AgentsContent() {
                 return (
                   <button
                     type="button"
-                    key={edge.source + "-" + edge.target}
+                    key={`${edge.source}-${edge.target}`}
                     className="agents-connected-row"
                     onClick={() => setSelectedId(other.id)}
                   >
-                    <span className={"agents-connected-dot " + other.color} />
+                    <span className={`agents-connected-dot ${other.color}`} />
                     <span>
                       {other.name}
                       <small>{edge.label}</small>
@@ -667,7 +671,7 @@ function AgentsContent() {
                 aria-pressed={agent.id === selectedId}
                 onClick={() => setSelectedId(agent.id)}
               >
-                <span className={"agents-connected-dot " + agent.color} />
+                <span className={`agents-connected-dot ${agent.color}`} />
                 <span>
                   {agent.name}
                   <small>{agent.kind}</small>

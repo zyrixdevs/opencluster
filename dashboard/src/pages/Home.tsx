@@ -1,17 +1,36 @@
 import { useQueryClient } from "@tanstack/react-query";
+import { useReducedMotion } from "framer-motion";
 import * as Icons from "lucide-react";
-import { useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { ResourceChart } from "../components/Charts";
+// ORIGINAL (preserved, not deleted — disabled by comment): import { ResourceChart } from "../components/Charts";
 import { Counter } from "../components/Counter";
-import { HologramVisual } from "../components/HologramVisual";
+// ORIGINAL (preserved, not deleted — disabled by comment): import { HologramVisual } from "../components/HologramVisual";
+import { LatticeLoader } from "../components/react-bits/controls";
+import BlurText from "../components/react-bits/text/BlurText";
+import SplitText from "../components/react-bits/text/SplitText";
 import * as UI from "../components/ui";
 import type { ActivityEvent, Software } from "../data/models";
 import { useDemoData, useLocalCollection } from "../data/useDashboardData";
 import { useDashboardStore } from "../state/useDashboardStore";
 import { ActivityLine } from "./shared";
 
+const CrystalizedBall = lazy(
+  () => import("../components/react-bits/visuals/CrystalizedBall"),
+);
+const ResourceChart = lazy(() =>
+  import("../components/Charts").then((module) => ({
+    default: module.ResourceChart,
+  })),
+);
+
 export function HomePage() {
+  const chartRef = useRef<HTMLDivElement>(null);
+  const [chartVisible, setChartVisible] = useState(false);
+  const reducedMotion = useReducedMotion();
+  const performanceMode = useDashboardStore((state) => state.performanceMode);
+  const demoMotion = useDashboardStore((state) => state.demoMotion);
+  const theme = useDashboardStore((state) => state.theme);
   const { cluster, clusters, nodes } = useDemoData();
   const { data: initialActivity = [] } =
     useLocalCollection<ActivityEvent>("activity");
@@ -19,6 +38,10 @@ export function HomePage() {
     useLocalCollection<Software>("software-catalog");
   const { data: agentEntities = [] } =
     useLocalCollection<import("../data/agents").AgentEntity>("agents");
+  const localAgents = useMemo(
+    () => agentEntities.filter((agent) => agent.kind === "agent"),
+    [agentEntities],
+  );
   const queryClient = useQueryClient();
   const displayName = useDashboardStore((state) => state.displayName);
   const online = nodes.filter(
@@ -41,6 +64,21 @@ export function HomePage() {
     day: "numeric",
   }).format(new Date());
   const hour = new Date().getHours();
+  useEffect(() => {
+    const element = chartRef.current;
+    if (!element || chartVisible) return undefined;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setChartVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" },
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [chartVisible]);
   const salutation =
     hour < 12
       ? "Good morning,"
@@ -55,15 +93,39 @@ export function HomePage() {
           <div className="eyebrow">
             <span className="hero-eyebrow-mark" /> OPENCLUSTER / LOCAL WORKSPACE
           </div>
+          {/* ORIGINAL (preserved, not deleted — disabled by comment): <h1>{salutation}<br /><em>{displayName}.</em></h1> */}
           <h1>
-            {salutation}
+            <SplitText
+              text={salutation}
+              tag="span"
+              textAlign="left"
+              splitType="words"
+              delay={55}
+              duration={0.8}
+            />
             <br />
-            <em>{displayName}.</em>
+            <em>
+              <SplitText
+                text={`${displayName}.`}
+                tag="span"
+                textAlign="left"
+                splitType="words"
+                delay={70}
+                duration={0.9}
+              />
+            </em>
           </h1>
-          <p>
-            Your cluster operations, agent workflows, and system signals in one
-            place.
-          </p>
+          {/* ORIGINAL (preserved, not deleted — disabled by comment): <p>Your cluster operations, agent workflows, and system signals in one place.</p> */}
+          <BlurText
+            text="Your cluster operations, agent workflows, and system signals in one place."
+            className="home-hero-description"
+            effect="focus"
+            animateBy="words"
+            delay={45}
+            stepDuration={0.3}
+            distance={12}
+            trigger="view"
+          />
           <div className="hero-actions">
             <Link to="/mission-control" className="button button-primary">
               <Icons.ScanEye size={15} /> Enter Mission Control
@@ -85,7 +147,47 @@ export function HomePage() {
             {greeting.toUpperCase()}
           </div>
         </div>
-        <HologramVisual />
+        {/* ORIGINAL (preserved, not deleted — disabled by comment): <HologramVisual /> */}
+        <div
+          className="home-crystal-visual"
+          role="img"
+          aria-label="Decorative crystal orb, not a live cluster visualization"
+        >
+          <div className="home-crystal-label">
+            <i /> CRYSTAL ORB <span>DEMO</span>
+          </div>
+          <div className="crystal-orbit-field" aria-hidden="true">
+            <span className="crystal-orbit crystal-orbit-one" />
+            <span className="crystal-orbit crystal-orbit-two" />
+            <span className="crystal-orbit crystal-orbit-three" />
+            <span className="crystal-core" />
+          </div>
+          <Suspense fallback={<LatticeLoader label="Loading crystal orb" />}>
+            <CrystalizedBall
+              preset="eclipse"
+              color="#62d3e8"
+              size={0.92}
+              glow={1.15}
+              flares={0.72}
+              crackle={0.38}
+              depth={0.78}
+              theme={
+                theme === "system"
+                  ? window.matchMedia("(prefers-color-scheme: light)").matches
+                    ? "light"
+                    : "dark"
+                  : theme
+              }
+              particleCount={6500}
+              interactive={!performanceMode && !reducedMotion && demoMotion}
+              paused={performanceMode || Boolean(reducedMotion) || !demoMotion}
+            />
+          </Suspense>
+          <div className="home-crystal-footer">
+            <span>LOCAL WORKSPACE</span>
+            <span>DECORATIVE VISUAL</span>
+          </div>
+        </div>
         <div className="hero-watermark" aria-hidden="true">
           OC / 01
         </div>
@@ -175,9 +277,7 @@ export function HomePage() {
           label="AI agents"
           value={
             <Counter
-              value={
-                agentEntities.filter((agent) => agent.kind === "agent").length
-              }
+              value={localAgents.length}
               minDigits={2}
               fontSize="inherit"
               fontWeight={600}
@@ -228,29 +328,26 @@ export function HomePage() {
               Open graph <Icons.ArrowRight size={13} />
             </Link>
           </div>
-          {agentEntities
-            .filter((agent) => agent.kind === "agent")
-            .slice(0, 3)
-            .map((agent) => (
-              <div className="agent-summary-row" key={agent.id}>
-                <span
-                  className={`agent-summary-icon ${agent.color === "violet" ? "purple" : ""}`}
-                >
-                  {agent.icon === "codex" ? (
-                    <Icons.BrainCircuit size={15} />
-                  ) : (
-                    <Icons.Bot size={15} />
-                  )}
-                </span>
-                <span>
-                  <b>{agent.name}</b>
-                  <small>{agent.role} · local record</small>
-                </span>
-                <i
-                  className={`agent-state-dot ${agent.status === "attention" || agent.status === "paused" ? "attention" : ""}`}
-                />
-              </div>
-            ))}
+          {localAgents.slice(0, 3).map((agent) => (
+            <div className="agent-summary-row" key={agent.id}>
+              <span
+                className={`agent-summary-icon ${agent.color === "violet" ? "purple" : ""}`}
+              >
+                {agent.icon === "codex" ? (
+                  <Icons.BrainCircuit size={15} />
+                ) : (
+                  <Icons.Bot size={15} />
+                )}
+              </span>
+              <span>
+                <b>{agent.name}</b>
+                <small>{agent.role} · local record</small>
+              </span>
+              <i
+                className={`agent-state-dot ${agent.status === "attention" || agent.status === "paused" ? "attention" : ""}`}
+              />
+            </div>
+          ))}
           <div className="agent-summary-foot">
             <Icons.CircleAlert size={13} /> Agent records are local
             configuration; no agent is connected.
@@ -342,8 +439,13 @@ export function HomePage() {
               <small>Local sample nodes · no live network telemetry</small>
             </div>
           </div>
-          <div className="home-chart">
-            <ResourceChart metric="cpu" compareMemory />
+          <div className="home-chart" ref={chartRef}>
+            {/* ORIGINAL (preserved, not deleted — disabled by comment): <ResourceChart metric="cpu" compareMemory /> */}
+            {chartVisible && (
+              <Suspense fallback={null}>
+                <ResourceChart metric="cpu" compareMemory />
+              </Suspense>
+            )}
           </div>
         </UI.Card>
         <UI.Card className="quick-actions">

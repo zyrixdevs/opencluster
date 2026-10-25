@@ -440,7 +440,9 @@ export const useDashboardStore = create<DashboardState>()(
           demoMotion: old?.demoMotion !== false,
           performanceMode: old?.performanceMode === true,
           theme:
-            old?.theme === "light" || old?.theme === "system"
+            old?.theme === "light" ||
+            old?.theme === "dark" ||
+            old?.theme === "system"
               ? old.theme
               : "dark",
         };
@@ -479,7 +481,9 @@ export const useDashboardStore = create<DashboardState>()(
               ? saved.displayName.slice(0, 40)
               : "operator",
           theme:
-            saved?.theme === "light" || saved?.theme === "system"
+            saved?.theme === "light" ||
+            saved?.theme === "dark" ||
+            saved?.theme === "system"
               ? saved.theme
               : "dark",
           motionMode:

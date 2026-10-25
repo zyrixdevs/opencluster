@@ -1,3 +1,5 @@
+import { useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import {
   Area,
   AreaChart,
@@ -7,6 +9,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { motionTiming } from "../animations/motion";
 import type { TelemetryPoint } from "../data/models";
 import { useLocalCollection } from "../data/useDashboardData";
 
@@ -21,6 +24,7 @@ export function ResourceChart({
   range?: "15m" | "1h" | "24h" | "7d";
   compareMemory?: boolean;
 }) {
+  const prefersReducedMotion = useReducedMotion();
   const { data: telemetry = [] } =
     useLocalCollection<TelemetryPoint>("telemetry");
   const series =
@@ -63,6 +67,38 @@ export function ResourceChart({
             ? `${index * 5} min`
             : point.time,
   }));
+
+  const animationKey = `${metric}:${range}:${compareMemory ? "compare" : "single"}`;
+  const [completedKey, setCompletedKey] = useState<string | null>(null);
+  const chartSnapshot = useRef<{
+    key: string;
+    data: typeof data;
+  } | null>(null);
+  if (
+    chartSnapshot.current?.key !== animationKey ||
+    !data.length ||
+    prefersReducedMotion ||
+    completedKey === animationKey
+  ) {
+    chartSnapshot.current = { key: animationKey, data };
+  }
+  const animateChart = !prefersReducedMotion && completedKey !== animationKey;
+  const chartData = animateChart ? (chartSnapshot.current?.data ?? data) : data;
+
+  useEffect(() => {
+    if (!data.length) return undefined;
+    if (prefersReducedMotion) {
+      setCompletedKey(animationKey);
+      return undefined;
+    }
+    if (completedKey === animationKey) return undefined;
+
+    const timeout = window.setTimeout(() => {
+      setCompletedKey(animationKey);
+    }, motionTiming.chart * 1000);
+    return () => window.clearTimeout(timeout);
+  }, [animationKey, completedKey, data.length, prefersReducedMotion]);
+
   if (!data.length)
     return (
       <div className="chart-empty" role="status">
@@ -73,7 +109,8 @@ export function ResourceChart({
     <div className={`chart-wrap ${compact ? "chart-compact" : ""}`}>
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart
-          data={data}
+          key={animationKey}
+          data={chartData}
           margin={{ top: 8, right: 8, left: -20, bottom: 0 }}
         >
           <defs>
@@ -127,7 +164,9 @@ export function ResourceChart({
               stroke={s.color}
               strokeWidth={2}
               fill={`url(#fill-${s.key})`}
-              isAnimationActive={false}
+              isAnimationActive={animateChart}
+              animationDuration={motionTiming.chart * 1000}
+              animationEasing="ease-out"
             />
           ))}
         </AreaChart>
