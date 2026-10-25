@@ -40,4 +40,4 @@ Target keyboard access, visible focus, semantic headings and controls, screen-re
 
 Use the palette, type, spacing, and radius tokens documented above and in `dashboard/src/styles.css`. Keep readable tabular numerals for metrics. The shell and Home direction have been rendered and reviewed at four viewport sizes; the remaining routes are still awaiting design review before visual propagation.
 
-Browser smoke checks also covered the circular theme reveal, canvas continuity during theme changes, and the keyboard search shortcut.
+Visual review captures: [1440×900 dark](visual-review/opencluster-home/home-1440x900-dark.png), [1920×1080 light](visual-review/opencluster-home/home-1920x1080-light.png), [768×1024 dark](visual-review/opencluster-home/home-768x1024-dark.png), and [390×844 light](visual-review/opencluster-home/home-390x844-light.png). Browser smoke checks also covered the circular theme reveal, canvas continuity during theme changes, and the keyboard search shortcut.
