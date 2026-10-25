@@ -24,7 +24,7 @@ OpenCluster Phase 1 is the permanent client application using **Vite + strict Ty
 | Async data contract | TanStack Query | Data caching hooks; IndexedDB provider now, remote provider later |
 | Local UI state | Zustand | Selected entities, inspector visibility, preferences |
 | Spatial graph editors | `@xyflow/react` | Agents graph and Automation canvas interaction |
-| 3D scenes | Three.js + React Three Fiber (R3F), Drei if needed | Mission Control globe and optional laser; OGL crystal orb in the Home hero |
+| 3D scenes | Three.js + React Three Fiber (R3F), Drei if needed | Mission Control Z.Y.R.I.X particle core and optional globe; OGL crystal orb in the Home hero |
 | Plots | Recharts | Monitoring and lightweight metrics |
 | UI motion | Motion for React (`motion/react`) | Cards, panels, route/page transitions |
 | Sequenced motion | GSAP | Rare hero choreography |
@@ -413,7 +413,8 @@ Create a shared **CanvasFrame**, **CanvasToolbar**, **GraphInspectorLayout**, **
 
 ## 8. 3D hologram architecture and failure isolation
 
-- Home uses SplitText/BlurText for welcome copy and a lazy OGL CrystalizedBall in the hero. Mission Control lazy imports its optional laser visual; the globe remains a lazy Three.js mode.
+- Home uses SplitText/BlurText for welcome copy and a lazy OGL CrystalizedBall in the hero. Mission Control defaults to a lazy React Flow topology with an independently rendered Three.js Z.Y.R.I.X core; orbit, globe, and laser alternatives remain available.
+- The topology fixture is illustrative. React Flow owns node positions, selection, and graph edges; the particle scene owns no graph relationships. WebGL failure leaves the DOM label and static CSS core visible.
 - Wrap scenes with React `Suspense` and error boundary; static SVG/poster fallback handles WebGL disabled/context-loss and loading.
 - Use small, reused buffers/instanced particles; avoid allocating geometry/materials in render loops.
 - Use quality-dependent `[min, max]` DPR (e.g. `[1, 1.5]` on desktop, lower on weaker devices) and capped geometry/particle budgets.
@@ -422,7 +423,7 @@ Create a shared **CanvasFrame**, **CanvasToolbar**, **GraphInspectorLayout**, **
 - Use WebGL context cleanup and detection; scene never steals pointer actions from adjacent cards.
 - `prefers-reduced-motion`, performance mode, and tab visibility can all disable continuous motion.
 
-The Home crystal and optional Mission Control laser are decorative sample-data visuals, not live cluster telemetry. Both respect performance/reduced-motion settings. The Wise-inspired skin and component adaptations are documented in `docs/DESIGN_SYSTEM.md`; effects without a real dashboard touchpoint remain available on the Component Lab route.
+The Home crystal, topology core, and optional Mission Control laser are illustrative visuals, not live cluster telemetry. They respect performance/reduced-motion settings. The Wise-inspired skin and component adaptations are documented in `docs/DESIGN_SYSTEM.md`; effects without a real dashboard touchpoint remain available on the Component Lab route.
 
 The `/component-lab` route makes the supplied SplitText, BlurText, CountUp, LaserFlow, PromptBar, AIContextMeter, ParticleButton, BellToggle, BellButton, SwitchButton, StatusMark, SwipeRow, LatticeLoader, DateRangeCalendar, TimezonePlanner, AccountMenu, AnimatedBeam, and AnimatedThemeToggler available in one interactive page. The CrystalizedBall appears only in the Home hero. Local-only controls do not imply backend functionality.
 
