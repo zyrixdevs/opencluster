@@ -30,6 +30,7 @@ export function HomePage() {
   const reducedMotion = useReducedMotion();
   const performanceMode = useDashboardStore((state) => state.performanceMode);
   const demoMotion = useDashboardStore((state) => state.demoMotion);
+  const theme = useDashboardStore((state) => state.theme);
   const { cluster, clusters, nodes } = useDemoData();
   const { data: initialActivity = [] } =
     useLocalCollection<ActivityEvent>("activity");
@@ -155,10 +156,29 @@ export function HomePage() {
           <div className="home-crystal-label">
             <i /> CRYSTAL ORB <span>DEMO</span>
           </div>
+          <div className="crystal-orbit-field" aria-hidden="true">
+            <span className="crystal-orbit crystal-orbit-one" />
+            <span className="crystal-orbit crystal-orbit-two" />
+            <span className="crystal-orbit crystal-orbit-three" />
+            <span className="crystal-core" />
+          </div>
           <Suspense fallback={<LatticeLoader label="Loading crystal orb" />}>
             <CrystalizedBall
               preset="eclipse"
-              particleCount={3200}
+              color="#62d3e8"
+              size={0.92}
+              glow={1.15}
+              flares={0.72}
+              crackle={0.38}
+              depth={0.78}
+              theme={
+                theme === "system"
+                  ? window.matchMedia("(prefers-color-scheme: light)").matches
+                    ? "light"
+                    : "dark"
+                  : theme
+              }
+              particleCount={6500}
               interactive={!performanceMode && !reducedMotion && demoMotion}
               paused={performanceMode || Boolean(reducedMotion) || !demoMotion}
             />

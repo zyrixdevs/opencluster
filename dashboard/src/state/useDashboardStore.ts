@@ -141,7 +141,7 @@ export const useDashboardStore = create<DashboardState>()(
       visualQuality: "auto",
       demoDataset: "multi-cluster",
       persistenceError: null,
-      theme: "light",
+      theme: "dark",
       addCluster: (name, region, description) =>
         serializeLocalMutation(async () => {
           const state = useDashboardStore.getState();
@@ -326,7 +326,7 @@ export const useDashboardStore = create<DashboardState>()(
             motionMode: "system",
             performanceMode: false,
             visualQuality: "auto",
-            theme: "light",
+            theme: "dark",
             demoDataset: "multi-cluster",
           });
           void dashboardQueryClient.invalidateQueries();
@@ -440,9 +440,11 @@ export const useDashboardStore = create<DashboardState>()(
           demoMotion: old?.demoMotion !== false,
           performanceMode: old?.performanceMode === true,
           theme:
-            old?.theme === "light" || old?.theme === "system"
+            old?.theme === "light" ||
+            old?.theme === "dark" ||
+            old?.theme === "system"
               ? old.theme
-              : "light",
+              : "dark",
         };
       },
       merge: (persisted, current) => {
@@ -479,9 +481,11 @@ export const useDashboardStore = create<DashboardState>()(
               ? saved.displayName.slice(0, 40)
               : "operator",
           theme:
-            saved?.theme === "light" || saved?.theme === "system"
+            saved?.theme === "light" ||
+            saved?.theme === "dark" ||
+            saved?.theme === "system"
               ? saved.theme
-              : "light",
+              : "dark",
           motionMode:
             saved?.motionMode === "reduced" || saved?.motionMode === "cinematic"
               ? saved.motionMode

@@ -138,6 +138,12 @@ describe("useDashboardStore", () => {
     );
     expect(persisted.state.theme).toBe("light");
     expect(persisted.state.selectedNodeId).toBeUndefined();
+
+    useDashboardStore.getState().setTheme("dark");
+    const darkPreferences = JSON.parse(
+      localStorage.getItem("opencluster-demo-preferences") ?? "{}",
+    );
+    expect(darkPreferences.state.theme).toBe("dark");
   });
 
   it("persists the non-sensitive performance preference", () => {

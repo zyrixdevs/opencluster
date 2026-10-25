@@ -343,7 +343,8 @@ export default function CrystalizedBall({
   }, [points]);
 
   useEffect(() => {
-    if (!paused) wake.current?.();
+    // ORIGINAL (preserved, not deleted — disabled by comment): if (!paused) wake.current?.();
+    wake.current?.();
   });
 
   return (
