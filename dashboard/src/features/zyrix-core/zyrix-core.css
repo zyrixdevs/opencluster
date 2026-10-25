@@ -1,0 +1,111 @@
+.zyrix-core {
+  position: relative;
+  display: grid;
+  width: 100%;
+  aspect-ratio: 1;
+  min-width: 0;
+  max-width: 360px;
+  place-items: center;
+  isolation: isolate;
+  color: #e8eaf0;
+}
+
+.zyrix-core-scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgb(95 81 135 / 13%),
+    rgb(11 16 24 / 0%) 69%
+  );
+}
+
+.zyrix-core-scene canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.zyrix-core-aura {
+  position: absolute;
+  inset: 24%;
+  border: 1px solid rgb(180 166 214 / 16%);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 38% 32%,
+    rgb(184 167 224 / 16%),
+    rgb(77 69 115 / 9%) 45%,
+    transparent 76%
+  );
+  box-shadow:
+    0 0 52px rgb(142 120 190 / 12%),
+    inset 0 0 26px rgb(191 178 227 / 7%);
+  pointer-events: none;
+}
+
+.zyrix-core-label {
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  text-shadow: 0 2px 14px #080b11;
+  pointer-events: none;
+}
+
+.zyrix-core-label strong {
+  font-family: var(--display, "Sora", sans-serif);
+  font-size: clamp(17px, 2vw, 24px);
+  font-weight: 600;
+  letter-spacing: 0.17em;
+}
+
+.zyrix-core-label span {
+  margin-top: 5px;
+  font-size: 12px;
+  color: #d0ccdc;
+}
+
+.zyrix-core-label small {
+  margin-top: 2px;
+  font-size: 11px;
+  color: #a4a2b0;
+}
+
+.zyrix-core-label .zyrix-core-status {
+  margin-top: 8px;
+  color: #c9b7e8;
+}
+
+.zyrix-core-scene.is-fallback {
+  background:
+    radial-gradient(
+      circle at 50% 50%,
+      rgb(170 151 214 / 34%) 0 1px,
+      transparent 2px
+    ),
+    radial-gradient(
+      circle at 31% 36%,
+      rgb(189 173 222 / 64%) 0 2px,
+      transparent 3px
+    ),
+    radial-gradient(
+      circle at 67% 28%,
+      rgb(134 129 183 / 60%) 0 1px,
+      transparent 3px
+    ),
+    radial-gradient(
+      circle at 70% 68%,
+      rgb(189 173 222 / 55%) 0 2px,
+      transparent 3px
+    ),
+    radial-gradient(circle, rgb(95 81 135 / 13%), transparent 69%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zyrix-core-aura {
+    animation: none;
+  }
+}

@@ -11,6 +11,13 @@ This is a lightweight decision log. Proposals below are not implementation commi
 - **Reason:** Apply the supplied dashboard motion references while preserving local state, canvas editors, routing, and accessibility.
 - **Limits:** The View Transitions API is browser-dependent; fallback changes theme instantly. WebGL/canvas performance was not profiled on physical hardware.
 
+### D-011 — Local topology fixture and Z.Y.R.I.X particle core
+
+- **Status:** Accepted for the dashboard's sample topology view, 2026-10-25.
+- **Decision:** Use the existing React Flow canvas for topology positions, selection, edges, pan/zoom, and local layout persistence. Render the Z.Y.R.I.X root with a route-lazy Three.js `Points` scene and a deterministic local sample fixture.
+- **Reason:** Match the approved orchestration composition while keeping graph behavior owned by the existing canvas and avoiding a runtime or redistribution dependency on Casberry exports.
+- **Limits:** All topology readings and operational states are illustrative. No service/VM creation, remote operation, live logs, AI request, or hardware telemetry is connected. Performance quality adapts by the dashboard's existing preference; physical-device frame profiling remains outstanding.
+
 ### D-009 — Wise-inspired dashboard visual system
 
 - **Status:** Accepted, 2026-10-23.

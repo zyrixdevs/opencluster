@@ -28,12 +28,17 @@ const GlobeScene = lazy(() =>
     default: module.GlobeScene,
   })),
 );
+const TopologyExperience = lazy(() =>
+  import("../features/topology/TopologyExperience").then((module) => ({
+    default: module.TopologyExperience,
+  })),
+);
 
 export function MissionPage() {
   const { cluster, nodes, clusters } = useDemoData();
   const [layout, setLayout] = useState<
     "topology" | "orbit" | "globe" | "laser"
-  >("globe");
+  >("topology");
   const performanceMode = useDashboardStore((state) => state.performanceMode);
   const reducedMotion = useReducedMotion();
   const [healthFilter, setHealthFilter] = useState<Health | "all">("all");
@@ -57,26 +62,30 @@ export function MissionPage() {
   ).length;
   return (
     <>
-      <PageTitle
-        eyebrow="CLUSTER VISUALIZATION"
-        title="Mission Control"
-        description="Explore the sample node layout. Topology and status use demo data."
-        actions={
-          <Link to="/clusters" className="button button-secondary">
-            <Layers3 size={15} /> Switch cluster <ChevronDown size={13} />
-          </Link>
-        }
-      />
-      <div className="context-strip">
-        <div>
-          <span className="cluster-pip" />
-          <b>{cluster?.name}</b>
-          <span>· {nodes.length} sample nodes</span>
-          <span className="context-separator" />
-          {cluster?.region}
+      {layout !== "topology" && (
+        <PageTitle
+          eyebrow="CLUSTER VISUALIZATION"
+          title="Mission Control"
+          description="Explore the sample node layout. Topology and status use demo data."
+          actions={
+            <Link to="/clusters" className="button button-secondary">
+              <Layers3 size={15} /> Switch cluster <ChevronDown size={13} />
+            </Link>
+          }
+        />
+      )}
+      {layout !== "topology" && (
+        <div className="context-strip">
+          <div>
+            <span className="cluster-pip" />
+            <b>{cluster?.name}</b>
+            <span>· {nodes.length} sample nodes</span>
+            <span className="context-separator" />
+            {cluster?.region}
+          </div>
+          <div className="context-demo">DEMO TOPOLOGY</div>
         </div>
-        <div className="context-demo">DEMO TOPOLOGY</div>
-      </div>
+      )}
       <div className="mission-toolbar">
         <fieldset className="mission-view-switch">
           <legend className="sr-only">Visualization mode</legend>
@@ -110,21 +119,27 @@ export function MissionPage() {
             <Waves size={13} /> Laser flow
           </Button>
         </fieldset>
-        <fieldset className="mission-filters">
-          <legend className="sr-only">Filter nodes by health</legend>
-          {(["all", "healthy", "warning", "offline"] as const).map((health) => (
-            <button
-              key={health}
-              type="button"
-              aria-pressed={healthFilter === health}
-              className={healthFilter === health ? "selected" : ""}
-              onClick={() => setHealthFilter(health)}
-            >
-              {health === "all" ? "All nodes" : health}
-              {health !== "all" && <i className={`health-mini ${health}`} />}
-            </button>
-          ))}
-        </fieldset>
+        {layout !== "topology" && (
+          <fieldset className="mission-filters">
+            <legend className="sr-only">Filter nodes by health</legend>
+            {(["all", "healthy", "warning", "offline"] as const).map(
+              (health) => (
+                <button
+                  key={health}
+                  type="button"
+                  aria-pressed={healthFilter === health}
+                  className={healthFilter === health ? "selected" : ""}
+                  onClick={() => setHealthFilter(health)}
+                >
+                  {health === "all" ? "All nodes" : health}
+                  {health !== "all" && (
+                    <i className={`health-mini ${health}`} />
+                  )}
+                </button>
+              ),
+            )}
+          </fieldset>
+        )}
       </div>
       {layout === "globe" ? (
         <Suspense fallback={<LoadingState label="Loading 3D cluster globe" />}>
@@ -158,38 +173,53 @@ export function MissionPage() {
             />
           </div>
         </Suspense>
+      ) : layout === "topology" ? (
+        <Suspense
+          fallback={<LoadingState label="Loading interactive topology" />}
+        >
+          <TopologyExperience />
+        </Suspense>
       ) : (
         <Topology nodes={visibleNodes} layout={layout} />
       )}
-      <div className="mission-analytics">
-        <div className="mission-metric">
-          <span>AVERAGE CPU</span>
-          <b>
-            <CountUp from={0} to={averageCpu} suffix="%" duration={1.2} />
-          </b>
-          <Progress value={averageCpu} />
-        </div>
-        <div className="mission-metric">
-          <span>AVERAGE MEMORY</span>
-          <b>
-            <CountUp from={0} to={averageMemory} suffix="%" duration={1.2} />
-          </b>
-          <Progress value={averageMemory} tone="purple" />
-        </div>
-        <div className="mission-metric mission-alerts">
-          <span>HEALTH ALERTS</span>
-          <b>
-            <CircleAlert size={15} /> {alerts}
-          </b>
-          <small>
-            {alerts ? "Sample nodes need attention" : "No demo alerts"}
-          </small>
-        </div>
-      </div>
-      <div className="mission-footnote">
-        <CircleAlert size={14} /> Node connections and status are illustrative.{" "}
-        {clusters.length} local demo clusters available.
-      </div>
+      {layout !== "topology" && (
+        <>
+          <div className="mission-analytics">
+            <div className="mission-metric">
+              <span>AVERAGE CPU</span>
+              <b>
+                <CountUp from={0} to={averageCpu} suffix="%" duration={1.2} />
+              </b>
+              <Progress value={averageCpu} />
+            </div>
+            <div className="mission-metric">
+              <span>AVERAGE MEMORY</span>
+              <b>
+                <CountUp
+                  from={0}
+                  to={averageMemory}
+                  suffix="%"
+                  duration={1.2}
+                />
+              </b>
+              <Progress value={averageMemory} tone="purple" />
+            </div>
+            <div className="mission-metric mission-alerts">
+              <span>HEALTH ALERTS</span>
+              <b>
+                <CircleAlert size={15} /> {alerts}
+              </b>
+              <small>
+                {alerts ? "Sample nodes need attention" : "No demo alerts"}
+              </small>
+            </div>
+          </div>
+          <div className="mission-footnote">
+            <CircleAlert size={14} /> Node connections and status are
+            illustrative. {clusters.length} local demo clusters available.
+          </div>
+        </>
+      )}
     </>
   );
 }

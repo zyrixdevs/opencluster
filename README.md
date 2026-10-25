@@ -46,6 +46,7 @@ For repository contribution setup, read [AGENTS.md](AGENTS.md), the [development
 - [Product requirements](docs/PRD.md) · [Roadmap](docs/ROADMAP.md) · [Architecture proposal](docs/ARCHITECTURE.md)
 - [Technology stack](docs/TECH_STACK.md) · [Design system](docs/DESIGN_SYSTEM.md)
 - [Dashboard motion and performance](docs/DASHBOARD_PERFORMANCE.md)
+- [Topology visualization and Z.Y.R.I.X particle core](docs/TOPOLOGY_VISUALIZATION.md)
 - [Dashboard product requirements](docs/DASHBOARD_PRD.md) · [UI/UX specification](docs/DASHBOARD_UI_UX_SPEC.md) · [Architecture and component map](docs/DASHBOARD_ARCHITECTURE_AND_COMPONENT_MAP.md)
 - [API design proposal](docs/API_DESIGN.md) · [Database design proposal](docs/DATABASE_DESIGN.md) · [Node protocol proposal](docs/NODE_PROTOCOL.md)
 - [Security architecture proposal](docs/SECURITY_ARCHITECTURE.md) · [Development](docs/DEVELOPMENT.md) · [Testing strategy](docs/TESTING_STRATEGY.md)
