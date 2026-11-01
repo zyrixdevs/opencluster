@@ -47,8 +47,15 @@ describe("local IndexedDB provider", () => {
     expect(seededAgents.map((agent) => agent.id).sort()).toEqual(
       agentSeedCatalog.map((agent) => agent.id).sort(),
     );
+    // ORIGINAL (preserved, not deleted — disabled by comment):
+    // await localProvider.put("agents", "codex", {
+    //   ...seededAgents[0],
+    //   name: "Locally customized Codex",
+    // });
+    const codex = seededAgents.find((agent) => agent.id === "codex");
+    if (!codex) throw new Error("Expected the seeded Codex agent.");
     await localProvider.put("agents", "codex", {
-      ...seededAgents[0],
+      ...codex,
       name: "Locally customized Codex",
     });
     await localProvider.initialize();
