@@ -217,7 +217,14 @@ const db = () =>
   }));
 const keyFor = (bucket: Bucket, id: string) => `${bucket}:${id}`;
 const recordFor = <T>(bucket: Bucket, id: string, value: T) => {
-  recordValueSchemas[bucket].parse(value);
+  const parsed = recordValueSchemas[bucket].parse(value);
+  if (
+    parsed &&
+    typeof parsed === "object" &&
+    "id" in parsed &&
+    parsed.id !== id
+  )
+    throw new Error(`Record key ${id} does not match its value id.`);
   return recordSchema.parse({ key: keyFor(bucket, id), bucket, id, value });
 };
 const valueFor = <T>(bucket: Bucket, value: unknown): T =>
